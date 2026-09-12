@@ -1,0 +1,12 @@
+{
+  "appName": "supplier-performance-api",
+  "domain": "supply_chain",
+  "type": "backend",
+  "stack": "supply_chain",
+  "port": 4510,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

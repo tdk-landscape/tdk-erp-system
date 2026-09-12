@@ -1,0 +1,12 @@
+{
+  "appName": "quote-to-cash-api",
+  "domain": "sales",
+  "type": "backend",
+  "stack": "sales",
+  "port": 4319,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

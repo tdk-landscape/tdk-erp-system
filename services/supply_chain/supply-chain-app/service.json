@@ -1,0 +1,14 @@
+{
+  "appName": "supply-chain-app",
+  "domain": "supply_chain",
+  "type": "frontend",
+  "stack": "supply_chain",
+  "port": 3060,
+  "dependencies": [
+    "supply-chain-planning-api"
+  ],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

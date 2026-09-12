@@ -1,0 +1,12 @@
+{
+  "appName": "pricing-api",
+  "domain": "sales",
+  "type": "backend",
+  "stack": "sales",
+  "port": 4303,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

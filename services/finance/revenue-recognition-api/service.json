@@ -1,0 +1,12 @@
+{
+  "appName": "revenue-recognition-api",
+  "domain": "finance",
+  "type": "backend",
+  "stack": "finance",
+  "port": 4023,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

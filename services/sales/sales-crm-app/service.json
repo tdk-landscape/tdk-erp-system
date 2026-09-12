@@ -1,0 +1,14 @@
+{
+  "appName": "sales-crm-app",
+  "domain": "sales",
+  "type": "frontend",
+  "stack": "sales",
+  "port": 3030,
+  "dependencies": [
+    "crm-api"
+  ],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

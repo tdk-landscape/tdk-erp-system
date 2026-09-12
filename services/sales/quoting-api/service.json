@@ -1,0 +1,12 @@
+{
+  "appName": "quoting-api",
+  "domain": "sales",
+  "type": "backend",
+  "stack": "sales",
+  "port": 4302,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

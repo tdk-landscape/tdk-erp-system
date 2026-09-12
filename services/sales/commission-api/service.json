@@ -1,0 +1,12 @@
+{
+  "appName": "commission-api",
+  "domain": "sales",
+  "type": "backend",
+  "stack": "sales",
+  "port": 4308,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

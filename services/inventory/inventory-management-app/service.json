@@ -1,0 +1,14 @@
+{
+  "appName": "inventory-management-app",
+  "domain": "inventory",
+  "type": "frontend",
+  "stack": "inventory",
+  "port": 3040,
+  "dependencies": [
+    "inventory-management-api"
+  ],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

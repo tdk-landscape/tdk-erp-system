@@ -1,0 +1,12 @@
+{
+  "appName": "accounts-receivable-api",
+  "domain": "finance",
+  "type": "backend",
+  "stack": "finance",
+  "port": 4012,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

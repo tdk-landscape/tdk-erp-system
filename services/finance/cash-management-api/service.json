@@ -1,0 +1,12 @@
+{
+  "appName": "cash-management-api",
+  "domain": "finance",
+  "type": "backend",
+  "stack": "finance",
+  "port": 4018,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

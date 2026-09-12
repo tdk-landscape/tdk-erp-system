@@ -1,0 +1,12 @@
+{
+  "appName": "supply-chain-risk-api",
+  "domain": "supply_chain",
+  "type": "backend",
+  "stack": "supply_chain",
+  "port": 4511,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

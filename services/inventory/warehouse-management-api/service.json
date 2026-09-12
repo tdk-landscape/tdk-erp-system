@@ -1,0 +1,12 @@
+{
+  "appName": "warehouse-management-api",
+  "domain": "inventory",
+  "type": "backend",
+  "stack": "inventory",
+  "port": 4201,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

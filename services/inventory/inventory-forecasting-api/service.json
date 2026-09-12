@@ -1,0 +1,12 @@
+{
+  "appName": "inventory-forecasting-api",
+  "domain": "inventory",
+  "type": "backend",
+  "stack": "inventory",
+  "port": 4206,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

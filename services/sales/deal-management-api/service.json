@@ -1,0 +1,12 @@
+{
+  "appName": "deal-management-api",
+  "domain": "sales",
+  "type": "backend",
+  "stack": "sales",
+  "port": 4317,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

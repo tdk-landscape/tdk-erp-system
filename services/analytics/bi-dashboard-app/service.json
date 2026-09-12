@@ -1,0 +1,14 @@
+{
+  "appName": "bi-dashboard-app",
+  "domain": "analytics",
+  "type": "frontend",
+  "stack": "analytics",
+  "port": 3070,
+  "dependencies": [
+    "business-intelligence-api"
+  ],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

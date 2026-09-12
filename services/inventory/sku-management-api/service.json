@@ -1,0 +1,12 @@
+{
+  "appName": "sku-management-api",
+  "domain": "inventory",
+  "type": "backend",
+  "stack": "inventory",
+  "port": 4205,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

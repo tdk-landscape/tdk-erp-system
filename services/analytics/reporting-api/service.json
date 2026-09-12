@@ -1,0 +1,12 @@
+{
+  "appName": "reporting-api",
+  "domain": "analytics",
+  "type": "backend",
+  "stack": "analytics",
+  "port": 4602,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

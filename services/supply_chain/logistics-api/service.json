@@ -1,0 +1,12 @@
+{
+  "appName": "logistics-api",
+  "domain": "supply_chain",
+  "type": "backend",
+  "stack": "supply_chain",
+  "port": 4504,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

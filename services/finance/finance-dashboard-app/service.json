@@ -1,0 +1,14 @@
+{
+  "appName": "finance-dashboard-app",
+  "domain": "finance",
+  "type": "frontend",
+  "stack": "finance",
+  "port": 3010,
+  "dependencies": [
+    "financial-analytics-api"
+  ],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "appName": "sales-automation-api",
+  "domain": "sales",
+  "type": "backend",
+  "stack": "sales",
+  "port": 4312,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

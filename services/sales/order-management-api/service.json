@@ -1,0 +1,12 @@
+{
+  "appName": "order-management-api",
+  "domain": "sales",
+  "type": "backend",
+  "stack": "sales",
+  "port": 4301,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

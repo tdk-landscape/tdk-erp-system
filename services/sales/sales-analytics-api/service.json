@@ -1,0 +1,12 @@
+{
+  "appName": "sales-analytics-api",
+  "domain": "sales",
+  "type": "backend",
+  "stack": "sales",
+  "port": 4307,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

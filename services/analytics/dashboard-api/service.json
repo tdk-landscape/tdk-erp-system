@@ -1,0 +1,12 @@
+{
+  "appName": "dashboard-api",
+  "domain": "analytics",
+  "type": "backend",
+  "stack": "analytics",
+  "port": 4605,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

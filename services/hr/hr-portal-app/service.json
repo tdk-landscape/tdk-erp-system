@@ -1,0 +1,14 @@
+{
+  "appName": "hr-portal-app",
+  "domain": "hr",
+  "type": "frontend",
+  "stack": "hr",
+  "port": 3020,
+  "dependencies": [
+    "employee-portal-api"
+  ],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

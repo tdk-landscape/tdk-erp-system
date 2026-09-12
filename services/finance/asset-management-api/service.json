@@ -1,0 +1,12 @@
+{
+  "appName": "asset-management-api",
+  "domain": "finance",
+  "type": "backend",
+  "stack": "finance",
+  "port": 4017,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "appName": "accounts-payable-api",
+  "domain": "finance",
+  "type": "backend",
+  "stack": "finance",
+  "port": 4011,
+  "dependencies": [],
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health"
+  }
+}
