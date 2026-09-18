@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "project": {
+    "name": "tdk-erp-system",
+    "version": "1.0.0"
+  },
+  "stacks": {
+    "pre_alpha": {
+      "name": "Pre-Alpha",
+      "description": "Core infrastructure and MVP services",
+      "services": []
+    },
+    "alpha": {
+      "name": "Alpha",
+      "description": "Essential business services",
+      "services": []
+    },
+    "beta": {
+      "name": "Beta",
+      "description": "Extended features",
+      "services": []
+    },
+    "out_of_scope": {
+      "name": "Out of Scope",
+      "description": "Future releases",
+      "services": []
+    }
+  },
+  "optional_infra": {
+    "monitoring": false,
+    "elk": false,
+    "debezium": false,
+    "golden_image": true
+  },
+  "discovery": {
+    "paths": [
+      "services/product/*",
+      "services/platform/*"
+    ]
+  },
+  "overrides": {}
+}
