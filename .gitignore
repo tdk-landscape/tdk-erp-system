@@ -1,7 +1,7 @@
 # Dependencies
 node_modules/
 bun.lockb
-
+.tdk/.tdk-out
 # Build outputs
 dist/
 build/
