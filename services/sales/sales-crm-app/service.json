@@ -1,9 +1,10 @@
 {
   "appName": "sales-crm-app",
   "domain": "sales",
-  "type": "frontend",
+  "appType": "frontend",
   "stack": "sales",
   "port": 3030,
+  "basePath": "/sales-crm-app",
   "dependencies": [
     "crm-api"
   ],

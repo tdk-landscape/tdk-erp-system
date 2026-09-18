@@ -1,9 +1,10 @@
 {
   "appName": "financial-reporting-api",
   "domain": "finance",
-  "type": "backend",
+  "appType": "backend",
   "stack": "finance",
   "port": 4014,
+  "apiPath": "/api/financial-reporting",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

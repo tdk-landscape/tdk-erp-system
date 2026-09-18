@@ -1,9 +1,10 @@
 {
   "appName": "invoice-generation-api",
   "domain": "sales",
-  "type": "backend",
+  "appType": "backend",
   "stack": "sales",
   "port": 4314,
+  "apiPath": "/api/invoice-generation",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

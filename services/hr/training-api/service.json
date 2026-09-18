@@ -1,9 +1,10 @@
 {
   "appName": "training-api",
   "domain": "hr",
-  "type": "backend",
+  "appType": "backend",
   "stack": "hr",
   "port": 4107,
+  "apiPath": "/api/training",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

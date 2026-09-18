@@ -1,9 +1,10 @@
 {
   "appName": "capacity-planning-api",
   "domain": "manufacturing",
-  "type": "backend",
+  "appType": "backend",
   "stack": "manufacturing",
   "port": 4407,
+  "apiPath": "/api/capacity-planning",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

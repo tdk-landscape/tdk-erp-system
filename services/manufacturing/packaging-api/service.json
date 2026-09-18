@@ -1,9 +1,10 @@
 {
   "appName": "packaging-api",
   "domain": "manufacturing",
-  "type": "backend",
+  "appType": "backend",
   "stack": "manufacturing",
   "port": 4412,
+  "apiPath": "/api/packaging",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

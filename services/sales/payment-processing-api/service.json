@@ -1,9 +1,10 @@
 {
   "appName": "payment-processing-api",
   "domain": "sales",
-  "type": "backend",
+  "appType": "backend",
   "stack": "sales",
   "port": 4315,
+  "apiPath": "/api/payment-processing",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

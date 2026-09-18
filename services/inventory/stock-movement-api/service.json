@@ -1,9 +1,10 @@
 {
   "appName": "stock-movement-api",
   "domain": "inventory",
-  "type": "backend",
+  "appType": "backend",
   "stack": "inventory",
   "port": 4207,
+  "apiPath": "/api/stock-movement",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

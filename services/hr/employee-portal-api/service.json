@@ -1,9 +1,10 @@
 {
   "appName": "employee-portal-api",
   "domain": "hr",
-  "type": "backend",
+  "appType": "backend",
   "stack": "hr",
   "port": 4110,
+  "apiPath": "/api/employee-portal",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

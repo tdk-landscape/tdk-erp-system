@@ -1,9 +1,10 @@
 {
   "appName": "bi-dashboard-app",
   "domain": "analytics",
-  "type": "frontend",
+  "appType": "frontend",
   "stack": "analytics",
   "port": 3070,
+  "basePath": "/bi-dashboard-app",
   "dependencies": [
     "business-intelligence-api"
   ],

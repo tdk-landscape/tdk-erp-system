@@ -1,9 +1,10 @@
 {
   "appName": "maintenance-api",
   "domain": "manufacturing",
-  "type": "backend",
+  "appType": "backend",
   "stack": "manufacturing",
   "port": 4403,
+  "apiPath": "/api/maintenance",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

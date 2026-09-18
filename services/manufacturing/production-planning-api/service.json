@@ -1,9 +1,10 @@
 {
   "appName": "production-planning-api",
   "domain": "manufacturing",
-  "type": "backend",
+  "appType": "backend",
   "stack": "manufacturing",
   "port": 4400,
+  "apiPath": "/api/production-planning",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

@@ -1,9 +1,10 @@
 {
   "appName": "demand-planning-api",
   "domain": "supply_chain",
-  "type": "backend",
+  "appType": "backend",
   "stack": "supply_chain",
   "port": 4506,
+  "apiPath": "/api/demand-planning",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

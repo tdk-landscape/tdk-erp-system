@@ -1,9 +1,10 @@
 {
   "appName": "customer-portal-api",
   "domain": "sales",
-  "type": "backend",
+  "appType": "backend",
   "stack": "sales",
   "port": 4313,
+  "apiPath": "/api/customer-portal",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

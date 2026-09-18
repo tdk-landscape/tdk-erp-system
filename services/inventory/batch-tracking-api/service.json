@@ -1,9 +1,10 @@
 {
   "appName": "batch-tracking-api",
   "domain": "inventory",
-  "type": "backend",
+  "appType": "backend",
   "stack": "inventory",
   "port": 4213,
+  "apiPath": "/api/batch-tracking",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

@@ -1,9 +1,10 @@
 {
   "appName": "vendor-portal-api",
   "domain": "supply_chain",
-  "type": "backend",
+  "appType": "backend",
   "stack": "supply_chain",
   "port": 4505,
+  "apiPath": "/api/vendor-portal",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

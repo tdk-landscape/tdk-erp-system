@@ -1,9 +1,10 @@
 {
   "appName": "production-costing-api",
   "domain": "manufacturing",
-  "type": "backend",
+  "appType": "backend",
   "stack": "manufacturing",
   "port": 4413,
+  "apiPath": "/api/production-costing",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

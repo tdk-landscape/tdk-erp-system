@@ -1,9 +1,10 @@
 {
   "appName": "contract-management-api",
   "domain": "sales",
-  "type": "backend",
+  "appType": "backend",
   "stack": "sales",
   "port": 4311,
+  "apiPath": "/api/contract-management",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

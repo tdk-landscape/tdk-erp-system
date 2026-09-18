@@ -1,9 +1,10 @@
 {
   "appName": "cost-accounting-api",
   "domain": "finance",
-  "type": "backend",
+  "appType": "backend",
   "stack": "finance",
   "port": 4022,
+  "apiPath": "/api/cost-accounting",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

@@ -1,9 +1,10 @@
 {
   "appName": "data-governance-api",
   "domain": "analytics",
-  "type": "backend",
+  "appType": "backend",
   "stack": "analytics",
   "port": 4604,
+  "apiPath": "/api/data-governance",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

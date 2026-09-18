@@ -1,9 +1,10 @@
 {
   "appName": "predictive-analytics-api",
   "domain": "analytics",
-  "type": "backend",
+  "appType": "backend",
   "stack": "analytics",
   "port": 4603,
+  "apiPath": "/api/predictive-analytics",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

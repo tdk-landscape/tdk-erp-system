@@ -1,9 +1,10 @@
 {
   "appName": "cycle-counting-api",
   "domain": "inventory",
-  "type": "backend",
+  "appType": "backend",
   "stack": "inventory",
   "port": 4209,
+  "apiPath": "/api/cycle-counting",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

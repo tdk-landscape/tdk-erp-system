@@ -1,9 +1,10 @@
 {
   "appName": "sales-portal-api",
   "domain": "sales",
-  "type": "backend",
+  "appType": "backend",
   "stack": "sales",
   "port": 4310,
+  "apiPath": "/api/sales-portal",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

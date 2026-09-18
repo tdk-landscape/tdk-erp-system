@@ -1,9 +1,10 @@
 {
   "appName": "equipment-management-api",
   "domain": "manufacturing",
-  "type": "backend",
+  "appType": "backend",
   "stack": "manufacturing",
   "port": 4410,
+  "apiPath": "/api/equipment-management",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

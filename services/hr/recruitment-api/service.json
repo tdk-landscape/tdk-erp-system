@@ -1,9 +1,10 @@
 {
   "appName": "recruitment-api",
   "domain": "hr",
-  "type": "backend",
+  "appType": "backend",
   "stack": "hr",
   "port": 4101,
+  "apiPath": "/api/recruitment",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

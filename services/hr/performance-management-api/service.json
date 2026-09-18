@@ -1,9 +1,10 @@
 {
   "appName": "performance-management-api",
   "domain": "hr",
-  "type": "backend",
+  "appType": "backend",
   "stack": "hr",
   "port": 4103,
+  "apiPath": "/api/performance-management",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

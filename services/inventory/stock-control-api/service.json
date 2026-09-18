@@ -1,9 +1,10 @@
 {
   "appName": "stock-control-api",
   "domain": "inventory",
-  "type": "backend",
+  "appType": "backend",
   "stack": "inventory",
   "port": 4202,
+  "apiPath": "/api/stock-control",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

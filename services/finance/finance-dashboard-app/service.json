@@ -1,9 +1,10 @@
 {
   "appName": "finance-dashboard-app",
   "domain": "finance",
-  "type": "frontend",
+  "appType": "frontend",
   "stack": "finance",
   "port": 3010,
+  "basePath": "/finance-dashboard-app",
   "dependencies": [
     "financial-analytics-api"
   ],

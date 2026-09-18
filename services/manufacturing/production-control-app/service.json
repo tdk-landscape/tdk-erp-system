@@ -1,9 +1,10 @@
 {
   "appName": "production-control-app",
   "domain": "manufacturing",
-  "type": "frontend",
+  "appType": "frontend",
   "stack": "manufacturing",
   "port": 3050,
+  "basePath": "/production-control-app",
   "dependencies": [
     "production-planning-api"
   ],

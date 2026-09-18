@@ -1,9 +1,10 @@
 {
   "appName": "production-tracking-api",
   "domain": "manufacturing",
-  "type": "backend",
+  "appType": "backend",
   "stack": "manufacturing",
   "port": 4408,
+  "apiPath": "/api/production-tracking",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

@@ -1,9 +1,10 @@
 {
   "appName": "manufacturing-analytics-api",
   "domain": "manufacturing",
-  "type": "backend",
+  "appType": "backend",
   "stack": "manufacturing",
   "port": 4414,
+  "apiPath": "/api/manufacturing-analytics",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

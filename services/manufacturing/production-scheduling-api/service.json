@@ -1,9 +1,10 @@
 {
   "appName": "production-scheduling-api",
   "domain": "manufacturing",
-  "type": "backend",
+  "appType": "backend",
   "stack": "manufacturing",
   "port": 4401,
+  "apiPath": "/api/production-scheduling",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

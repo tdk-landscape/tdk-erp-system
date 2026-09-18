@@ -1,9 +1,10 @@
 {
   "appName": "budgeting-api",
   "domain": "finance",
-  "type": "backend",
+  "appType": "backend",
   "stack": "finance",
   "port": 4013,
+  "apiPath": "/api/budgeting",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

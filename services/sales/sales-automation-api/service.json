@@ -1,9 +1,10 @@
 {
   "appName": "sales-automation-api",
   "domain": "sales",
-  "type": "backend",
+  "appType": "backend",
   "stack": "sales",
   "port": 4312,
+  "apiPath": "/api/sales-automation",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

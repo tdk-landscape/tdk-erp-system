@@ -1,9 +1,10 @@
 {
   "appName": "sales-analytics-api",
   "domain": "sales",
-  "type": "backend",
+  "appType": "backend",
   "stack": "sales",
   "port": 4307,
+  "apiPath": "/api/sales-analytics",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

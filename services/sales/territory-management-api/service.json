@@ -1,9 +1,10 @@
 {
   "appName": "territory-management-api",
   "domain": "sales",
-  "type": "backend",
+  "appType": "backend",
   "stack": "sales",
   "port": 4309,
+  "apiPath": "/api/territory-management",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

@@ -1,9 +1,10 @@
 {
   "appName": "benefits-administration-api",
   "domain": "hr",
-  "type": "backend",
+  "appType": "backend",
   "stack": "hr",
   "port": 4105,
+  "apiPath": "/api/benefits-administration",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

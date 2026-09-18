@@ -1,9 +1,10 @@
 {
   "appName": "quality-control-api",
   "domain": "manufacturing",
-  "type": "backend",
+  "appType": "backend",
   "stack": "manufacturing",
   "port": 4402,
+  "apiPath": "/api/quality-control",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

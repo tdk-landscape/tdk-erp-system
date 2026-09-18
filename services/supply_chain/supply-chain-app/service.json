@@ -1,9 +1,10 @@
 {
   "appName": "supply-chain-app",
   "domain": "supply_chain",
-  "type": "frontend",
+  "appType": "frontend",
   "stack": "supply_chain",
   "port": 3060,
+  "basePath": "/supply-chain-app",
   "dependencies": [
     "supply-chain-planning-api"
   ],

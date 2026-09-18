@@ -1,9 +1,10 @@
 {
   "appName": "inventory-replenishment-api",
   "domain": "inventory",
-  "type": "backend",
+  "appType": "backend",
   "stack": "inventory",
   "port": 4212,
+  "apiPath": "/api/inventory-replenishment",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

@@ -1,9 +1,10 @@
 {
   "appName": "inventory-reporting-api",
   "domain": "inventory",
-  "type": "backend",
+  "appType": "backend",
   "stack": "inventory",
   "port": 4217,
+  "apiPath": "/api/inventory-reporting",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

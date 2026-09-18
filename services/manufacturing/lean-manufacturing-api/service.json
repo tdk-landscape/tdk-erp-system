@@ -1,9 +1,10 @@
 {
   "appName": "lean-manufacturing-api",
   "domain": "manufacturing",
-  "type": "backend",
+  "appType": "backend",
   "stack": "manufacturing",
   "port": 4409,
+  "apiPath": "/api/lean-manufacturing",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

@@ -1,9 +1,10 @@
 {
   "appName": "expense-management-api",
   "domain": "finance",
-  "type": "backend",
+  "appType": "backend",
   "stack": "finance",
   "port": 4015,
+  "apiPath": "/api/expense-management",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

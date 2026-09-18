@@ -1,9 +1,10 @@
 {
   "appName": "asset-management-api",
   "domain": "finance",
-  "type": "backend",
+  "appType": "backend",
   "stack": "finance",
   "port": 4017,
+  "apiPath": "/api/asset-management",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

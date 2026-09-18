@@ -1,9 +1,10 @@
 {
   "appName": "banking-integration-api",
   "domain": "finance",
-  "type": "backend",
+  "appType": "backend",
   "stack": "finance",
   "port": 4019,
+  "apiPath": "/api/banking-integration",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

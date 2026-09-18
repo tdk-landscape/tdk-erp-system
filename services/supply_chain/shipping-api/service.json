@@ -1,9 +1,10 @@
 {
   "appName": "shipping-api",
   "domain": "supply_chain",
-  "type": "backend",
+  "appType": "backend",
   "stack": "supply_chain",
   "port": 4508,
+  "apiPath": "/api/shipping",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

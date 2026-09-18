@@ -1,9 +1,10 @@
 {
   "appName": "inventory-reservation-api",
   "domain": "inventory",
-  "type": "backend",
+  "appType": "backend",
   "stack": "inventory",
   "port": 4215,
+  "apiPath": "/api/inventory-reservation",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

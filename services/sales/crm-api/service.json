@@ -1,9 +1,10 @@
 {
   "appName": "crm-api",
   "domain": "sales",
-  "type": "backend",
+  "appType": "backend",
   "stack": "sales",
   "port": 4300,
+  "apiPath": "/api/crm",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

@@ -1,9 +1,10 @@
 {
   "appName": "supplier-management-api",
   "domain": "supply_chain",
-  "type": "backend",
+  "appType": "backend",
   "stack": "supply_chain",
   "port": 4501,
+  "apiPath": "/api/supplier-management",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

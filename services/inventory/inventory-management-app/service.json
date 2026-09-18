@@ -1,9 +1,10 @@
 {
   "appName": "inventory-management-app",
   "domain": "inventory",
-  "type": "frontend",
+  "appType": "frontend",
   "stack": "inventory",
   "port": 3040,
+  "basePath": "/inventory-management-app",
   "dependencies": [
     "inventory-management-api"
   ],

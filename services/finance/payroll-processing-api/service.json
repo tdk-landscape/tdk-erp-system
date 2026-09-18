@@ -1,9 +1,10 @@
 {
   "appName": "payroll-processing-api",
   "domain": "finance",
-  "type": "backend",
+  "appType": "backend",
   "stack": "finance",
   "port": 4021,
+  "apiPath": "/api/payroll-processing",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

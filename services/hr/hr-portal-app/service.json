@@ -1,9 +1,10 @@
 {
   "appName": "hr-portal-app",
   "domain": "hr",
-  "type": "frontend",
+  "appType": "frontend",
   "stack": "hr",
   "port": 3020,
+  "basePath": "/hr-portal-app",
   "dependencies": [
     "employee-portal-api"
   ],

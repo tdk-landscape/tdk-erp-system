@@ -1,9 +1,10 @@
 {
   "appName": "work-order-api",
   "domain": "manufacturing",
-  "type": "backend",
+  "appType": "backend",
   "stack": "manufacturing",
   "port": 4405,
+  "apiPath": "/api/work-order",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,

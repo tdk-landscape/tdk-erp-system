@@ -1,9 +1,10 @@
 {
   "appName": "inventory-audit-api",
   "domain": "inventory",
-  "type": "backend",
+  "appType": "backend",
   "stack": "inventory",
   "port": 4210,
+  "apiPath": "/api/inventory-audit",
   "dependencies": [],
   "healthCheck": {
     "enabled": true,
