@@ -4,24 +4,19 @@
     "name": "tdk-erp-system",
     "version": "1.0.0"
   },
-  "optional_infra": {
-    "monitoring": false,
-    "elk": false,
-    "debezium": false,
-    "golden_image": true
-  },
-  "discovery": {
-    "paths": [
-      "services/product/*",
-      "services/platform/*"
-    ]
-  },
-  "overrides": {},
   "phases": {
     "pre_alpha": {
       "name": "Pre-Alpha",
       "description": "Core infrastructure and MVP services",
-      "enabledStacks": []
+      "enabledStacks": [
+        "analytics",
+        "finance",
+        "hr",
+        "inventory",
+        "manufacturing",
+        "sales",
+        "supply_chain"
+      ]
     },
     "alpha": {
       "name": "Alpha",
@@ -38,5 +33,18 @@
       "description": "Future releases",
       "enabledStacks": []
     }
-  }
+  },
+  "optional_infra": {
+    "monitoring": false,
+    "elk": false,
+    "debezium": false,
+    "golden_image": true,
+    "verdaccio": false
+  },
+  "discovery": {
+    "paths": [
+      "services/*/*"
+    ]
+  },
+  "overrides": {}
 }

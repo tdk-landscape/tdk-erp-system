@@ -9,7 +9,7 @@
 # PORT DEFINITIONS - Change these to change ports everywhere
 # =============================================================================
 x-backend-port: &backend-port 4016
-x-frontend-port: &frontend-port 3010
+x-frontend-port: &frontend-port 80
 
 # =============================================================================
 # MEMORY LIMITS
@@ -56,42 +56,53 @@ services:
       - PORT=4011
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.accounts-payable-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.accounts-payable-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.accounts-payable-api.entrypoints=web"
       - "traefik.http.routers.accounts-payable-api.service=accounts-payable-api"
 
-      - "traefik.http.services.accounts-payable-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.accounts-payable-api.loadbalancer.server.port=4011"
       - "traefik.http.services.accounts-payable-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.accounts-payable-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.accounts-payable-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.accounts-payable-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.accounts-payable-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.accounts-payable-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/accounts-payable`)"
       - "traefik.http.routers.accounts-payable-api-project.entrypoints=web"
       - "traefik.http.routers.accounts-payable-api-project.service=accounts-payable-api"
       - "traefik.http.routers.accounts-payable-api-project.middlewares=accounts-payable-api-strip-prefix-project"
-      - "traefik.http.middlewares.accounts-payable-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.accounts-payable-api-project.priority=123"
+      - "traefik.http.middlewares.accounts-payable-api-strip-prefix-project.stripprefix.prefixes=/api/accounts-payable"
+      - "traefik.http.routers.accounts-payable-api-project.priority=121"
+
+      - "traefik.http.routers.accounts-payable-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.accounts-payable-api-management.entrypoints=web"
+      - "traefik.http.routers.accounts-payable-api-management.service=accounts-payable-api"
+      - "traefik.http.routers.accounts-payable-api-management.middlewares=accounts-payable-api-strip-prefix-management"
+      - "traefik.http.middlewares.accounts-payable-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.accounts-payable-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.accounts-payable-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.accounts-payable-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.accounts-payable-api-redirect.redirectregex.replacement=`/api/accounts-payable/$$1`"
       - "traefik.http.middlewares.accounts-payable-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4011/health"]
       interval: 10s
@@ -134,42 +145,53 @@ services:
       - PORT=4012
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.accounts-receivable-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.accounts-receivable-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.accounts-receivable-api.entrypoints=web"
       - "traefik.http.routers.accounts-receivable-api.service=accounts-receivable-api"
 
-      - "traefik.http.services.accounts-receivable-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.accounts-receivable-api.loadbalancer.server.port=4012"
       - "traefik.http.services.accounts-receivable-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.accounts-receivable-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.accounts-receivable-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.accounts-receivable-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.accounts-receivable-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.accounts-receivable-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/accounts-receivable`)"
       - "traefik.http.routers.accounts-receivable-api-project.entrypoints=web"
       - "traefik.http.routers.accounts-receivable-api-project.service=accounts-receivable-api"
       - "traefik.http.routers.accounts-receivable-api-project.middlewares=accounts-receivable-api-strip-prefix-project"
-      - "traefik.http.middlewares.accounts-receivable-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.accounts-receivable-api-project.priority=123"
+      - "traefik.http.middlewares.accounts-receivable-api-strip-prefix-project.stripprefix.prefixes=/api/accounts-receivable"
+      - "traefik.http.routers.accounts-receivable-api-project.priority=124"
+
+      - "traefik.http.routers.accounts-receivable-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.accounts-receivable-api-management.entrypoints=web"
+      - "traefik.http.routers.accounts-receivable-api-management.service=accounts-receivable-api"
+      - "traefik.http.routers.accounts-receivable-api-management.middlewares=accounts-receivable-api-strip-prefix-management"
+      - "traefik.http.middlewares.accounts-receivable-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.accounts-receivable-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.accounts-receivable-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.accounts-receivable-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.accounts-receivable-api-redirect.redirectregex.replacement=`/api/accounts-receivable/$$1`"
       - "traefik.http.middlewares.accounts-receivable-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4012/health"]
       interval: 10s
@@ -212,42 +234,53 @@ services:
       - PORT=4017
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.asset-management-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.asset-management-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.asset-management-api.entrypoints=web"
       - "traefik.http.routers.asset-management-api.service=asset-management-api"
 
-      - "traefik.http.services.asset-management-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.asset-management-api.loadbalancer.server.port=4017"
       - "traefik.http.services.asset-management-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.asset-management-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.asset-management-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.asset-management-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.asset-management-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.asset-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/asset-management`)"
       - "traefik.http.routers.asset-management-api-project.entrypoints=web"
       - "traefik.http.routers.asset-management-api-project.service=asset-management-api"
       - "traefik.http.routers.asset-management-api-project.middlewares=asset-management-api-strip-prefix-project"
-      - "traefik.http.middlewares.asset-management-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.asset-management-api-project.priority=123"
+      - "traefik.http.middlewares.asset-management-api-strip-prefix-project.stripprefix.prefixes=/api/asset-management"
+      - "traefik.http.routers.asset-management-api-project.priority=121"
+
+      - "traefik.http.routers.asset-management-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.asset-management-api-management.entrypoints=web"
+      - "traefik.http.routers.asset-management-api-management.service=asset-management-api"
+      - "traefik.http.routers.asset-management-api-management.middlewares=asset-management-api-strip-prefix-management"
+      - "traefik.http.middlewares.asset-management-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.asset-management-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.asset-management-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.asset-management-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.asset-management-api-redirect.redirectregex.replacement=`/api/asset-management/$$1`"
       - "traefik.http.middlewares.asset-management-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4017/health"]
       interval: 10s
@@ -290,42 +323,53 @@ services:
       - PORT=4024
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.audit-trail-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.audit-trail-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.audit-trail-api.entrypoints=web"
       - "traefik.http.routers.audit-trail-api.service=audit-trail-api"
 
-      - "traefik.http.services.audit-trail-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.audit-trail-api.loadbalancer.server.port=4024"
       - "traefik.http.services.audit-trail-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.audit-trail-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.audit-trail-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.audit-trail-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.audit-trail-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.audit-trail-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/audit-trail`)"
       - "traefik.http.routers.audit-trail-api-project.entrypoints=web"
       - "traefik.http.routers.audit-trail-api-project.service=audit-trail-api"
       - "traefik.http.routers.audit-trail-api-project.middlewares=audit-trail-api-strip-prefix-project"
-      - "traefik.http.middlewares.audit-trail-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.audit-trail-api-project.priority=123"
+      - "traefik.http.middlewares.audit-trail-api-strip-prefix-project.stripprefix.prefixes=/api/audit-trail"
+      - "traefik.http.routers.audit-trail-api-project.priority=116"
+
+      - "traefik.http.routers.audit-trail-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.audit-trail-api-management.entrypoints=web"
+      - "traefik.http.routers.audit-trail-api-management.service=audit-trail-api"
+      - "traefik.http.routers.audit-trail-api-management.middlewares=audit-trail-api-strip-prefix-management"
+      - "traefik.http.middlewares.audit-trail-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.audit-trail-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.audit-trail-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.audit-trail-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.audit-trail-api-redirect.redirectregex.replacement=`/api/audit-trail/$$1`"
       - "traefik.http.middlewares.audit-trail-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4024/health"]
       interval: 10s
@@ -368,42 +412,53 @@ services:
       - PORT=4019
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.banking-integration-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.banking-integration-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.banking-integration-api.entrypoints=web"
       - "traefik.http.routers.banking-integration-api.service=banking-integration-api"
 
-      - "traefik.http.services.banking-integration-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.banking-integration-api.loadbalancer.server.port=4019"
       - "traefik.http.services.banking-integration-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.banking-integration-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.banking-integration-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.banking-integration-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.banking-integration-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.banking-integration-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/banking-integration`)"
       - "traefik.http.routers.banking-integration-api-project.entrypoints=web"
       - "traefik.http.routers.banking-integration-api-project.service=banking-integration-api"
       - "traefik.http.routers.banking-integration-api-project.middlewares=banking-integration-api-strip-prefix-project"
-      - "traefik.http.middlewares.banking-integration-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.banking-integration-api-project.priority=123"
+      - "traefik.http.middlewares.banking-integration-api-strip-prefix-project.stripprefix.prefixes=/api/banking-integration"
+      - "traefik.http.routers.banking-integration-api-project.priority=124"
+
+      - "traefik.http.routers.banking-integration-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.banking-integration-api-management.entrypoints=web"
+      - "traefik.http.routers.banking-integration-api-management.service=banking-integration-api"
+      - "traefik.http.routers.banking-integration-api-management.middlewares=banking-integration-api-strip-prefix-management"
+      - "traefik.http.middlewares.banking-integration-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.banking-integration-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.banking-integration-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.banking-integration-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.banking-integration-api-redirect.redirectregex.replacement=`/api/banking-integration/$$1`"
       - "traefik.http.middlewares.banking-integration-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4019/health"]
       interval: 10s
@@ -446,42 +501,53 @@ services:
       - PORT=4013
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.budgeting-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.budgeting-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.budgeting-api.entrypoints=web"
       - "traefik.http.routers.budgeting-api.service=budgeting-api"
 
-      - "traefik.http.services.budgeting-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.budgeting-api.loadbalancer.server.port=4013"
       - "traefik.http.services.budgeting-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.budgeting-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.budgeting-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.budgeting-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.budgeting-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.budgeting-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/budgeting`)"
       - "traefik.http.routers.budgeting-api-project.entrypoints=web"
       - "traefik.http.routers.budgeting-api-project.service=budgeting-api"
       - "traefik.http.routers.budgeting-api-project.middlewares=budgeting-api-strip-prefix-project"
-      - "traefik.http.middlewares.budgeting-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.budgeting-api-project.priority=123"
+      - "traefik.http.middlewares.budgeting-api-strip-prefix-project.stripprefix.prefixes=/api/budgeting"
+      - "traefik.http.routers.budgeting-api-project.priority=114"
+
+      - "traefik.http.routers.budgeting-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.budgeting-api-management.entrypoints=web"
+      - "traefik.http.routers.budgeting-api-management.service=budgeting-api"
+      - "traefik.http.routers.budgeting-api-management.middlewares=budgeting-api-strip-prefix-management"
+      - "traefik.http.middlewares.budgeting-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.budgeting-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.budgeting-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.budgeting-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.budgeting-api-redirect.redirectregex.replacement=`/api/budgeting/$$1`"
       - "traefik.http.middlewares.budgeting-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4013/health"]
       interval: 10s
@@ -524,42 +590,53 @@ services:
       - PORT=4018
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.cash-management-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.cash-management-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.cash-management-api.entrypoints=web"
       - "traefik.http.routers.cash-management-api.service=cash-management-api"
 
-      - "traefik.http.services.cash-management-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.cash-management-api.loadbalancer.server.port=4018"
       - "traefik.http.services.cash-management-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.cash-management-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.cash-management-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.cash-management-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.cash-management-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.cash-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/cash-management`)"
       - "traefik.http.routers.cash-management-api-project.entrypoints=web"
       - "traefik.http.routers.cash-management-api-project.service=cash-management-api"
       - "traefik.http.routers.cash-management-api-project.middlewares=cash-management-api-strip-prefix-project"
-      - "traefik.http.middlewares.cash-management-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.cash-management-api-project.priority=123"
+      - "traefik.http.middlewares.cash-management-api-strip-prefix-project.stripprefix.prefixes=/api/cash-management"
+      - "traefik.http.routers.cash-management-api-project.priority=120"
+
+      - "traefik.http.routers.cash-management-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.cash-management-api-management.entrypoints=web"
+      - "traefik.http.routers.cash-management-api-management.service=cash-management-api"
+      - "traefik.http.routers.cash-management-api-management.middlewares=cash-management-api-strip-prefix-management"
+      - "traefik.http.middlewares.cash-management-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.cash-management-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.cash-management-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.cash-management-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.cash-management-api-redirect.redirectregex.replacement=`/api/cash-management/$$1`"
       - "traefik.http.middlewares.cash-management-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4018/health"]
       interval: 10s
@@ -602,42 +679,53 @@ services:
       - PORT=4022
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.cost-accounting-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.cost-accounting-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.cost-accounting-api.entrypoints=web"
       - "traefik.http.routers.cost-accounting-api.service=cost-accounting-api"
 
-      - "traefik.http.services.cost-accounting-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.cost-accounting-api.loadbalancer.server.port=4022"
       - "traefik.http.services.cost-accounting-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.cost-accounting-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.cost-accounting-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.cost-accounting-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.cost-accounting-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.cost-accounting-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/cost-accounting`)"
       - "traefik.http.routers.cost-accounting-api-project.entrypoints=web"
       - "traefik.http.routers.cost-accounting-api-project.service=cost-accounting-api"
       - "traefik.http.routers.cost-accounting-api-project.middlewares=cost-accounting-api-strip-prefix-project"
-      - "traefik.http.middlewares.cost-accounting-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.cost-accounting-api-project.priority=123"
+      - "traefik.http.middlewares.cost-accounting-api-strip-prefix-project.stripprefix.prefixes=/api/cost-accounting"
+      - "traefik.http.routers.cost-accounting-api-project.priority=120"
+
+      - "traefik.http.routers.cost-accounting-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.cost-accounting-api-management.entrypoints=web"
+      - "traefik.http.routers.cost-accounting-api-management.service=cost-accounting-api"
+      - "traefik.http.routers.cost-accounting-api-management.middlewares=cost-accounting-api-strip-prefix-management"
+      - "traefik.http.middlewares.cost-accounting-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.cost-accounting-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.cost-accounting-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.cost-accounting-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.cost-accounting-api-redirect.redirectregex.replacement=`/api/cost-accounting/$$1`"
       - "traefik.http.middlewares.cost-accounting-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4022/health"]
       interval: 10s
@@ -680,42 +768,53 @@ services:
       - PORT=4015
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.expense-management-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.expense-management-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.expense-management-api.entrypoints=web"
       - "traefik.http.routers.expense-management-api.service=expense-management-api"
 
-      - "traefik.http.services.expense-management-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.expense-management-api.loadbalancer.server.port=4015"
       - "traefik.http.services.expense-management-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.expense-management-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.expense-management-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.expense-management-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.expense-management-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.expense-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/expense-management`)"
       - "traefik.http.routers.expense-management-api-project.entrypoints=web"
       - "traefik.http.routers.expense-management-api-project.service=expense-management-api"
       - "traefik.http.routers.expense-management-api-project.middlewares=expense-management-api-strip-prefix-project"
-      - "traefik.http.middlewares.expense-management-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.middlewares.expense-management-api-strip-prefix-project.stripprefix.prefixes=/api/expense-management"
       - "traefik.http.routers.expense-management-api-project.priority=123"
+
+      - "traefik.http.routers.expense-management-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.expense-management-api-management.entrypoints=web"
+      - "traefik.http.routers.expense-management-api-management.service=expense-management-api"
+      - "traefik.http.routers.expense-management-api-management.middlewares=expense-management-api-strip-prefix-management"
+      - "traefik.http.middlewares.expense-management-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.expense-management-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.expense-management-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.expense-management-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.expense-management-api-redirect.redirectregex.replacement=`/api/expense-management/$$1`"
       - "traefik.http.middlewares.expense-management-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4015/health"]
       interval: 10s
@@ -747,18 +846,18 @@ services:
         - VITE_APP_ENV=development
     labels:
         - "traefik.enable=true"
-        - 'traefik.http.routers.finance-dashboard-app.rule=Host(`finance-dashboard-app.localhost`) || (Host(`app.tdk-project.localhost`) && PathPrefix(`/finance-dashboard-app`)) || (Host(`localhost`) && PathPrefix(`/finance-dashboard-app`))'
+        - 'traefik.http.routers.finance-dashboard-app.rule=Host(`finance-dashboard-app.localhost`) || (Host(`app.tdk-erp-system.localhost`) && PathPrefix(`/finance-dashboard-app`)) || (Host(`localhost`) && PathPrefix(`/finance-dashboard-app`))'
         - "traefik.http.routers.finance-dashboard-app.entrypoints=web,websecure"
         - "traefik.http.routers.finance-dashboard-app.priority=122"
         - "traefik.http.routers.finance-dashboard-app.middlewares=finance-dashboard-app-strip-prefix"
         - "traefik.http.middlewares.finance-dashboard-app-strip-prefix.stripprefix.prefixes=/finance-dashboard-app"
-        - "traefik.http.services.finance-dashboard-app.loadbalancer.server.port=*frontend-port"
-        - "traefik.docker.network=tdk_project_traefik-public"
+        - "traefik.http.services.finance-dashboard-app.loadbalancer.server.port=80"
+        - "traefik.docker.network=tdk_erp_system_traefik-public"
     networks:
-        - tdk_project_traefik-public
-        - tdk_project_backend
+        - tdk_erp_system_traefik-public
+        - tdk_erp_system_backend
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3010"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:80"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -789,42 +888,53 @@ services:
       - PORT=4020
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.financial-analytics-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.financial-analytics-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.financial-analytics-api.entrypoints=web"
       - "traefik.http.routers.financial-analytics-api.service=financial-analytics-api"
 
-      - "traefik.http.services.financial-analytics-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.financial-analytics-api.loadbalancer.server.port=4020"
       - "traefik.http.services.financial-analytics-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.financial-analytics-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.financial-analytics-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.financial-analytics-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.financial-analytics-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.financial-analytics-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/financial-analytics`)"
       - "traefik.http.routers.financial-analytics-api-project.entrypoints=web"
       - "traefik.http.routers.financial-analytics-api-project.service=financial-analytics-api"
       - "traefik.http.routers.financial-analytics-api-project.middlewares=financial-analytics-api-strip-prefix-project"
-      - "traefik.http.middlewares.financial-analytics-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.financial-analytics-api-project.priority=123"
+      - "traefik.http.middlewares.financial-analytics-api-strip-prefix-project.stripprefix.prefixes=/api/financial-analytics"
+      - "traefik.http.routers.financial-analytics-api-project.priority=124"
+
+      - "traefik.http.routers.financial-analytics-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.financial-analytics-api-management.entrypoints=web"
+      - "traefik.http.routers.financial-analytics-api-management.service=financial-analytics-api"
+      - "traefik.http.routers.financial-analytics-api-management.middlewares=financial-analytics-api-strip-prefix-management"
+      - "traefik.http.middlewares.financial-analytics-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.financial-analytics-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.financial-analytics-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.financial-analytics-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.financial-analytics-api-redirect.redirectregex.replacement=`/api/financial-analytics/$$1`"
       - "traefik.http.middlewares.financial-analytics-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4020/health"]
       interval: 10s
@@ -867,42 +977,53 @@ services:
       - PORT=4014
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.financial-reporting-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.financial-reporting-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.financial-reporting-api.entrypoints=web"
       - "traefik.http.routers.financial-reporting-api.service=financial-reporting-api"
 
-      - "traefik.http.services.financial-reporting-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.financial-reporting-api.loadbalancer.server.port=4014"
       - "traefik.http.services.financial-reporting-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.financial-reporting-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.financial-reporting-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.financial-reporting-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.financial-reporting-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.financial-reporting-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/financial-reporting`)"
       - "traefik.http.routers.financial-reporting-api-project.entrypoints=web"
       - "traefik.http.routers.financial-reporting-api-project.service=financial-reporting-api"
       - "traefik.http.routers.financial-reporting-api-project.middlewares=financial-reporting-api-strip-prefix-project"
-      - "traefik.http.middlewares.financial-reporting-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.financial-reporting-api-project.priority=123"
+      - "traefik.http.middlewares.financial-reporting-api-strip-prefix-project.stripprefix.prefixes=/api/financial-reporting"
+      - "traefik.http.routers.financial-reporting-api-project.priority=124"
+
+      - "traefik.http.routers.financial-reporting-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.financial-reporting-api-management.entrypoints=web"
+      - "traefik.http.routers.financial-reporting-api-management.service=financial-reporting-api"
+      - "traefik.http.routers.financial-reporting-api-management.middlewares=financial-reporting-api-strip-prefix-management"
+      - "traefik.http.middlewares.financial-reporting-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.financial-reporting-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.financial-reporting-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.financial-reporting-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.financial-reporting-api-redirect.redirectregex.replacement=`/api/financial-reporting/$$1`"
       - "traefik.http.middlewares.financial-reporting-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4014/health"]
       interval: 10s
@@ -945,42 +1066,53 @@ services:
       - PORT=4010
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.general-ledger-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.general-ledger-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.general-ledger-api.entrypoints=web"
       - "traefik.http.routers.general-ledger-api.service=general-ledger-api"
 
-      - "traefik.http.services.general-ledger-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.general-ledger-api.loadbalancer.server.port=4010"
       - "traefik.http.services.general-ledger-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.general-ledger-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.general-ledger-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.general-ledger-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.general-ledger-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.general-ledger-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/general-ledger`)"
       - "traefik.http.routers.general-ledger-api-project.entrypoints=web"
       - "traefik.http.routers.general-ledger-api-project.service=general-ledger-api"
       - "traefik.http.routers.general-ledger-api-project.middlewares=general-ledger-api-strip-prefix-project"
-      - "traefik.http.middlewares.general-ledger-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.general-ledger-api-project.priority=123"
+      - "traefik.http.middlewares.general-ledger-api-strip-prefix-project.stripprefix.prefixes=/api/general-ledger"
+      - "traefik.http.routers.general-ledger-api-project.priority=119"
+
+      - "traefik.http.routers.general-ledger-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.general-ledger-api-management.entrypoints=web"
+      - "traefik.http.routers.general-ledger-api-management.service=general-ledger-api"
+      - "traefik.http.routers.general-ledger-api-management.middlewares=general-ledger-api-strip-prefix-management"
+      - "traefik.http.middlewares.general-ledger-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.general-ledger-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.general-ledger-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.general-ledger-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.general-ledger-api-redirect.redirectregex.replacement=`/api/general-ledger/$$1`"
       - "traefik.http.middlewares.general-ledger-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4010/health"]
       interval: 10s
@@ -1023,42 +1155,53 @@ services:
       - PORT=4021
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.payroll-processing-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.payroll-processing-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.payroll-processing-api.entrypoints=web"
       - "traefik.http.routers.payroll-processing-api.service=payroll-processing-api"
 
-      - "traefik.http.services.payroll-processing-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.payroll-processing-api.loadbalancer.server.port=4021"
       - "traefik.http.services.payroll-processing-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.payroll-processing-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.payroll-processing-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.payroll-processing-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.payroll-processing-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.payroll-processing-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/payroll-processing`)"
       - "traefik.http.routers.payroll-processing-api-project.entrypoints=web"
       - "traefik.http.routers.payroll-processing-api-project.service=payroll-processing-api"
       - "traefik.http.routers.payroll-processing-api-project.middlewares=payroll-processing-api-strip-prefix-project"
-      - "traefik.http.middlewares.payroll-processing-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.middlewares.payroll-processing-api-strip-prefix-project.stripprefix.prefixes=/api/payroll-processing"
       - "traefik.http.routers.payroll-processing-api-project.priority=123"
+
+      - "traefik.http.routers.payroll-processing-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.payroll-processing-api-management.entrypoints=web"
+      - "traefik.http.routers.payroll-processing-api-management.service=payroll-processing-api"
+      - "traefik.http.routers.payroll-processing-api-management.middlewares=payroll-processing-api-strip-prefix-management"
+      - "traefik.http.middlewares.payroll-processing-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.payroll-processing-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.payroll-processing-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.payroll-processing-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.payroll-processing-api-redirect.redirectregex.replacement=`/api/payroll-processing/$$1`"
       - "traefik.http.middlewares.payroll-processing-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4021/health"]
       interval: 10s
@@ -1101,42 +1244,53 @@ services:
       - PORT=4023
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.revenue-recognition-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.revenue-recognition-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.revenue-recognition-api.entrypoints=web"
       - "traefik.http.routers.revenue-recognition-api.service=revenue-recognition-api"
 
-      - "traefik.http.services.revenue-recognition-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.revenue-recognition-api.loadbalancer.server.port=4023"
       - "traefik.http.services.revenue-recognition-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.revenue-recognition-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.revenue-recognition-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.revenue-recognition-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.revenue-recognition-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.revenue-recognition-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/revenue-recognition`)"
       - "traefik.http.routers.revenue-recognition-api-project.entrypoints=web"
       - "traefik.http.routers.revenue-recognition-api-project.service=revenue-recognition-api"
       - "traefik.http.routers.revenue-recognition-api-project.middlewares=revenue-recognition-api-strip-prefix-project"
-      - "traefik.http.middlewares.revenue-recognition-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.revenue-recognition-api-project.priority=123"
+      - "traefik.http.middlewares.revenue-recognition-api-strip-prefix-project.stripprefix.prefixes=/api/revenue-recognition"
+      - "traefik.http.routers.revenue-recognition-api-project.priority=124"
+
+      - "traefik.http.routers.revenue-recognition-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.revenue-recognition-api-management.entrypoints=web"
+      - "traefik.http.routers.revenue-recognition-api-management.service=revenue-recognition-api"
+      - "traefik.http.routers.revenue-recognition-api-management.middlewares=revenue-recognition-api-strip-prefix-management"
+      - "traefik.http.middlewares.revenue-recognition-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.revenue-recognition-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.revenue-recognition-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.revenue-recognition-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.revenue-recognition-api-redirect.redirectregex.replacement=`/api/revenue-recognition/$$1`"
       - "traefik.http.middlewares.revenue-recognition-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4023/health"]
       interval: 10s
@@ -1179,42 +1333,53 @@ services:
       - PORT=4016
       - INSTANCE_ID=0
       - NATS_QUEUE_GROUP=finance_backend_svc
-      - TILT_DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
-      - TILT_NATS_URL=nats://tdk_project_nats:4222
+      - TILT_DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://tdk_project:${DB_PASSWORD}@tdk_project_postgres:5432/tdk_project_finance?schema=public
+      - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_finance?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.tax-compliance-api.rule=Host(`finance.backend.tdk_project.local`)"
+      - "traefik.http.routers.tax-compliance-api.rule=Host(`finance.backend.tdk_erp_system.local`)"
       - "traefik.http.routers.tax-compliance-api.entrypoints=web"
       - "traefik.http.routers.tax-compliance-api.service=tax-compliance-api"
 
-      - "traefik.http.services.tax-compliance-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.tax-compliance-api.loadbalancer.server.port=4016"
       - "traefik.http.services.tax-compliance-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.tax-compliance-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.tax-compliance-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.tax-compliance-api.loadbalancer.healthcheck.followredirects=false"
-      - "traefik.docker.network=tdk_project_traefik-public"
+      - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.tax-compliance-api-project.rule=Host(`api.tdk-project.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.tax-compliance-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/tax-compliance`)"
       - "traefik.http.routers.tax-compliance-api-project.entrypoints=web"
       - "traefik.http.routers.tax-compliance-api-project.service=tax-compliance-api"
       - "traefik.http.routers.tax-compliance-api-project.middlewares=tax-compliance-api-strip-prefix-project"
-      - "traefik.http.middlewares.tax-compliance-api-strip-prefix-project.stripprefix.prefixes=/api/finance-management"
-      - "traefik.http.routers.tax-compliance-api-project.priority=123"
+      - "traefik.http.middlewares.tax-compliance-api-strip-prefix-project.stripprefix.prefixes=/api/tax-compliance"
+      - "traefik.http.routers.tax-compliance-api-project.priority=119"
+
+      - "traefik.http.routers.tax-compliance-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/finance-management`)"
+      - "traefik.http.routers.tax-compliance-api-management.entrypoints=web"
+      - "traefik.http.routers.tax-compliance-api-management.service=tax-compliance-api"
+      - "traefik.http.routers.tax-compliance-api-management.middlewares=tax-compliance-api-strip-prefix-management"
+      - "traefik.http.middlewares.tax-compliance-api-strip-prefix-management.stripprefix.prefixes=/api/finance-management"
+      - "traefik.http.routers.tax-compliance-api-management.priority=123"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.tax-compliance-api-redirect.redirectregex.regex=^`/finance-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.tax-compliance-api-redirect.redirectregex.replacement=`/api/finance-management/$$1`"
+      - "traefik.http.middlewares.tax-compliance-api-redirect.redirectregex.replacement=`/api/tax-compliance/$$1`"
       - "traefik.http.middlewares.tax-compliance-api-redirect.redirectregex.permanent=true"
 
     networks:
-      - tdk_project_traefik-public
-      - tdk_project_backend
-      - tdk_project_database
-      - tdk_project_infisical-network
+      - tdk_erp_system_traefik-public
+      - tdk_erp_system_backend
+      - tdk_erp_system_database
+      - tdk_erp_system_infisical-network
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "5", "http://localhost:4016/health"]
       interval: 10s
@@ -1234,11 +1399,11 @@ services:
           memory: 256M
 
 networks:
-  tdk_project_traefik-public:
+  tdk_erp_system_traefik-public:
     external: true
-  tdk_project_backend:
+  tdk_erp_system_backend:
     external: true
-  tdk_project_database:
+  tdk_erp_system_database:
     external: true
-  tdk_project_infisical-network:
+  tdk_erp_system_infisical-network:
     external: true

@@ -9,7 +9,7 @@
 # PORT DEFINITIONS - Change these to change ports everywhere
 # =============================================================================
 x-backend-port: &backend-port 4201
-x-frontend-port: &frontend-port 3040
+x-frontend-port: &frontend-port 80
 
 # =============================================================================
 # MEMORY LIMITS
@@ -60,6 +60,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -68,23 +72,30 @@ services:
       - "traefik.http.routers.batch-tracking-api.entrypoints=web"
       - "traefik.http.routers.batch-tracking-api.service=batch-tracking-api"
 
-      - "traefik.http.services.batch-tracking-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.batch-tracking-api.loadbalancer.server.port=4213"
       - "traefik.http.services.batch-tracking-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.batch-tracking-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.batch-tracking-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.batch-tracking-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.batch-tracking-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.batch-tracking-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/batch-tracking`)"
       - "traefik.http.routers.batch-tracking-api-project.entrypoints=web"
       - "traefik.http.routers.batch-tracking-api-project.service=batch-tracking-api"
       - "traefik.http.routers.batch-tracking-api-project.middlewares=batch-tracking-api-strip-prefix-project"
-      - "traefik.http.middlewares.batch-tracking-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.batch-tracking-api-project.priority=125"
+      - "traefik.http.middlewares.batch-tracking-api-strip-prefix-project.stripprefix.prefixes=/api/batch-tracking"
+      - "traefik.http.routers.batch-tracking-api-project.priority=119"
+
+      - "traefik.http.routers.batch-tracking-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.batch-tracking-api-management.entrypoints=web"
+      - "traefik.http.routers.batch-tracking-api-management.service=batch-tracking-api"
+      - "traefik.http.routers.batch-tracking-api-management.middlewares=batch-tracking-api-strip-prefix-management"
+      - "traefik.http.middlewares.batch-tracking-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.batch-tracking-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.batch-tracking-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.batch-tracking-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.batch-tracking-api-redirect.redirectregex.replacement=`/api/batch-tracking/$$1`"
       - "traefik.http.middlewares.batch-tracking-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -138,6 +149,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -146,23 +161,30 @@ services:
       - "traefik.http.routers.cycle-counting-api.entrypoints=web"
       - "traefik.http.routers.cycle-counting-api.service=cycle-counting-api"
 
-      - "traefik.http.services.cycle-counting-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.cycle-counting-api.loadbalancer.server.port=4209"
       - "traefik.http.services.cycle-counting-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.cycle-counting-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.cycle-counting-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.cycle-counting-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.cycle-counting-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.cycle-counting-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/cycle-counting`)"
       - "traefik.http.routers.cycle-counting-api-project.entrypoints=web"
       - "traefik.http.routers.cycle-counting-api-project.service=cycle-counting-api"
       - "traefik.http.routers.cycle-counting-api-project.middlewares=cycle-counting-api-strip-prefix-project"
-      - "traefik.http.middlewares.cycle-counting-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.cycle-counting-api-project.priority=125"
+      - "traefik.http.middlewares.cycle-counting-api-strip-prefix-project.stripprefix.prefixes=/api/cycle-counting"
+      - "traefik.http.routers.cycle-counting-api-project.priority=119"
+
+      - "traefik.http.routers.cycle-counting-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.cycle-counting-api-management.entrypoints=web"
+      - "traefik.http.routers.cycle-counting-api-management.service=cycle-counting-api"
+      - "traefik.http.routers.cycle-counting-api-management.middlewares=cycle-counting-api-strip-prefix-management"
+      - "traefik.http.middlewares.cycle-counting-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.cycle-counting-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.cycle-counting-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.cycle-counting-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.cycle-counting-api-redirect.redirectregex.replacement=`/api/cycle-counting/$$1`"
       - "traefik.http.middlewares.cycle-counting-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -216,6 +238,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -224,23 +250,30 @@ services:
       - "traefik.http.routers.expiry-management-api.entrypoints=web"
       - "traefik.http.routers.expiry-management-api.service=expiry-management-api"
 
-      - "traefik.http.services.expiry-management-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.expiry-management-api.loadbalancer.server.port=4214"
       - "traefik.http.services.expiry-management-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.expiry-management-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.expiry-management-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.expiry-management-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.expiry-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.expiry-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/expiry-management`)"
       - "traefik.http.routers.expiry-management-api-project.entrypoints=web"
       - "traefik.http.routers.expiry-management-api-project.service=expiry-management-api"
       - "traefik.http.routers.expiry-management-api-project.middlewares=expiry-management-api-strip-prefix-project"
-      - "traefik.http.middlewares.expiry-management-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.expiry-management-api-project.priority=125"
+      - "traefik.http.middlewares.expiry-management-api-strip-prefix-project.stripprefix.prefixes=/api/expiry-management"
+      - "traefik.http.routers.expiry-management-api-project.priority=122"
+
+      - "traefik.http.routers.expiry-management-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.expiry-management-api-management.entrypoints=web"
+      - "traefik.http.routers.expiry-management-api-management.service=expiry-management-api"
+      - "traefik.http.routers.expiry-management-api-management.middlewares=expiry-management-api-strip-prefix-management"
+      - "traefik.http.middlewares.expiry-management-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.expiry-management-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.expiry-management-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.expiry-management-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.expiry-management-api-redirect.redirectregex.replacement=`/api/expiry-management/$$1`"
       - "traefik.http.middlewares.expiry-management-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -294,6 +327,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -302,23 +339,30 @@ services:
       - "traefik.http.routers.inventory-audit-api.entrypoints=web"
       - "traefik.http.routers.inventory-audit-api.service=inventory-audit-api"
 
-      - "traefik.http.services.inventory-audit-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.inventory-audit-api.loadbalancer.server.port=4210"
       - "traefik.http.services.inventory-audit-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.inventory-audit-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.inventory-audit-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.inventory-audit-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.inventory-audit-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-audit-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-audit`)"
       - "traefik.http.routers.inventory-audit-api-project.entrypoints=web"
       - "traefik.http.routers.inventory-audit-api-project.service=inventory-audit-api"
       - "traefik.http.routers.inventory-audit-api-project.middlewares=inventory-audit-api-strip-prefix-project"
-      - "traefik.http.middlewares.inventory-audit-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.inventory-audit-api-project.priority=125"
+      - "traefik.http.middlewares.inventory-audit-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-audit"
+      - "traefik.http.routers.inventory-audit-api-project.priority=120"
+
+      - "traefik.http.routers.inventory-audit-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-audit-api-management.entrypoints=web"
+      - "traefik.http.routers.inventory-audit-api-management.service=inventory-audit-api"
+      - "traefik.http.routers.inventory-audit-api-management.middlewares=inventory-audit-api-strip-prefix-management"
+      - "traefik.http.middlewares.inventory-audit-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.inventory-audit-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.inventory-audit-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.inventory-audit-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.inventory-audit-api-redirect.redirectregex.replacement=`/api/inventory-audit/$$1`"
       - "traefik.http.middlewares.inventory-audit-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -372,6 +416,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -380,23 +428,30 @@ services:
       - "traefik.http.routers.inventory-forecasting-api.entrypoints=web"
       - "traefik.http.routers.inventory-forecasting-api.service=inventory-forecasting-api"
 
-      - "traefik.http.services.inventory-forecasting-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.inventory-forecasting-api.loadbalancer.server.port=4206"
       - "traefik.http.services.inventory-forecasting-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.inventory-forecasting-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.inventory-forecasting-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.inventory-forecasting-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.inventory-forecasting-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-forecasting-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-forecasting`)"
       - "traefik.http.routers.inventory-forecasting-api-project.entrypoints=web"
       - "traefik.http.routers.inventory-forecasting-api-project.service=inventory-forecasting-api"
       - "traefik.http.routers.inventory-forecasting-api-project.middlewares=inventory-forecasting-api-strip-prefix-project"
-      - "traefik.http.middlewares.inventory-forecasting-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.inventory-forecasting-api-project.priority=125"
+      - "traefik.http.middlewares.inventory-forecasting-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-forecasting"
+      - "traefik.http.routers.inventory-forecasting-api-project.priority=126"
+
+      - "traefik.http.routers.inventory-forecasting-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-forecasting-api-management.entrypoints=web"
+      - "traefik.http.routers.inventory-forecasting-api-management.service=inventory-forecasting-api"
+      - "traefik.http.routers.inventory-forecasting-api-management.middlewares=inventory-forecasting-api-strip-prefix-management"
+      - "traefik.http.middlewares.inventory-forecasting-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.inventory-forecasting-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.inventory-forecasting-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.inventory-forecasting-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.inventory-forecasting-api-redirect.redirectregex.replacement=`/api/inventory-forecasting/$$1`"
       - "traefik.http.middlewares.inventory-forecasting-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -450,6 +505,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -458,7 +517,7 @@ services:
       - "traefik.http.routers.inventory-management-api.entrypoints=web"
       - "traefik.http.routers.inventory-management-api.service=inventory-management-api"
 
-      - "traefik.http.services.inventory-management-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.inventory-management-api.loadbalancer.server.port=4200"
       - "traefik.http.services.inventory-management-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.inventory-management-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.inventory-management-api.loadbalancer.healthcheck.timeout=5s"
@@ -518,13 +577,13 @@ services:
         - "traefik.http.routers.inventory-management-app.priority=125"
         - "traefik.http.routers.inventory-management-app.middlewares=inventory-management-app-strip-prefix"
         - "traefik.http.middlewares.inventory-management-app-strip-prefix.stripprefix.prefixes=/inventory-management-app"
-        - "traefik.http.services.inventory-management-app.loadbalancer.server.port=*frontend-port"
+        - "traefik.http.services.inventory-management-app.loadbalancer.server.port=80"
         - "traefik.docker.network=tdk_erp_system_traefik-public"
     networks:
         - tdk_erp_system_traefik-public
         - tdk_erp_system_backend
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3040"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:80"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -559,6 +618,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -567,23 +630,30 @@ services:
       - "traefik.http.routers.inventory-optimization-api.entrypoints=web"
       - "traefik.http.routers.inventory-optimization-api.service=inventory-optimization-api"
 
-      - "traefik.http.services.inventory-optimization-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.inventory-optimization-api.loadbalancer.server.port=4203"
       - "traefik.http.services.inventory-optimization-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.inventory-optimization-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.inventory-optimization-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.inventory-optimization-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.inventory-optimization-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-optimization-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-optimization`)"
       - "traefik.http.routers.inventory-optimization-api-project.entrypoints=web"
       - "traefik.http.routers.inventory-optimization-api-project.service=inventory-optimization-api"
       - "traefik.http.routers.inventory-optimization-api-project.middlewares=inventory-optimization-api-strip-prefix-project"
-      - "traefik.http.middlewares.inventory-optimization-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.inventory-optimization-api-project.priority=125"
+      - "traefik.http.middlewares.inventory-optimization-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-optimization"
+      - "traefik.http.routers.inventory-optimization-api-project.priority=127"
+
+      - "traefik.http.routers.inventory-optimization-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-optimization-api-management.entrypoints=web"
+      - "traefik.http.routers.inventory-optimization-api-management.service=inventory-optimization-api"
+      - "traefik.http.routers.inventory-optimization-api-management.middlewares=inventory-optimization-api-strip-prefix-management"
+      - "traefik.http.middlewares.inventory-optimization-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.inventory-optimization-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.inventory-optimization-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.inventory-optimization-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.inventory-optimization-api-redirect.redirectregex.replacement=`/api/inventory-optimization/$$1`"
       - "traefik.http.middlewares.inventory-optimization-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -637,6 +707,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -645,23 +719,30 @@ services:
       - "traefik.http.routers.inventory-replenishment-api.entrypoints=web"
       - "traefik.http.routers.inventory-replenishment-api.service=inventory-replenishment-api"
 
-      - "traefik.http.services.inventory-replenishment-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.inventory-replenishment-api.loadbalancer.server.port=4212"
       - "traefik.http.services.inventory-replenishment-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.inventory-replenishment-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.inventory-replenishment-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.inventory-replenishment-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.inventory-replenishment-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-replenishment-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-replenishment`)"
       - "traefik.http.routers.inventory-replenishment-api-project.entrypoints=web"
       - "traefik.http.routers.inventory-replenishment-api-project.service=inventory-replenishment-api"
       - "traefik.http.routers.inventory-replenishment-api-project.middlewares=inventory-replenishment-api-strip-prefix-project"
-      - "traefik.http.middlewares.inventory-replenishment-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.inventory-replenishment-api-project.priority=125"
+      - "traefik.http.middlewares.inventory-replenishment-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-replenishment"
+      - "traefik.http.routers.inventory-replenishment-api-project.priority=128"
+
+      - "traefik.http.routers.inventory-replenishment-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-replenishment-api-management.entrypoints=web"
+      - "traefik.http.routers.inventory-replenishment-api-management.service=inventory-replenishment-api"
+      - "traefik.http.routers.inventory-replenishment-api-management.middlewares=inventory-replenishment-api-strip-prefix-management"
+      - "traefik.http.middlewares.inventory-replenishment-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.inventory-replenishment-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.inventory-replenishment-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.inventory-replenishment-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.inventory-replenishment-api-redirect.redirectregex.replacement=`/api/inventory-replenishment/$$1`"
       - "traefik.http.middlewares.inventory-replenishment-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -715,6 +796,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -723,23 +808,30 @@ services:
       - "traefik.http.routers.inventory-reporting-api.entrypoints=web"
       - "traefik.http.routers.inventory-reporting-api.service=inventory-reporting-api"
 
-      - "traefik.http.services.inventory-reporting-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.inventory-reporting-api.loadbalancer.server.port=4217"
       - "traefik.http.services.inventory-reporting-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.inventory-reporting-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.inventory-reporting-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.inventory-reporting-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.inventory-reporting-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-reporting-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-reporting`)"
       - "traefik.http.routers.inventory-reporting-api-project.entrypoints=web"
       - "traefik.http.routers.inventory-reporting-api-project.service=inventory-reporting-api"
       - "traefik.http.routers.inventory-reporting-api-project.middlewares=inventory-reporting-api-strip-prefix-project"
-      - "traefik.http.middlewares.inventory-reporting-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.inventory-reporting-api-project.priority=125"
+      - "traefik.http.middlewares.inventory-reporting-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-reporting"
+      - "traefik.http.routers.inventory-reporting-api-project.priority=124"
+
+      - "traefik.http.routers.inventory-reporting-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-reporting-api-management.entrypoints=web"
+      - "traefik.http.routers.inventory-reporting-api-management.service=inventory-reporting-api"
+      - "traefik.http.routers.inventory-reporting-api-management.middlewares=inventory-reporting-api-strip-prefix-management"
+      - "traefik.http.middlewares.inventory-reporting-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.inventory-reporting-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.inventory-reporting-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.inventory-reporting-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.inventory-reporting-api-redirect.redirectregex.replacement=`/api/inventory-reporting/$$1`"
       - "traefik.http.middlewares.inventory-reporting-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -793,6 +885,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -801,23 +897,30 @@ services:
       - "traefik.http.routers.inventory-reservation-api.entrypoints=web"
       - "traefik.http.routers.inventory-reservation-api.service=inventory-reservation-api"
 
-      - "traefik.http.services.inventory-reservation-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.inventory-reservation-api.loadbalancer.server.port=4215"
       - "traefik.http.services.inventory-reservation-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.inventory-reservation-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.inventory-reservation-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.inventory-reservation-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.inventory-reservation-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-reservation-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-reservation`)"
       - "traefik.http.routers.inventory-reservation-api-project.entrypoints=web"
       - "traefik.http.routers.inventory-reservation-api-project.service=inventory-reservation-api"
       - "traefik.http.routers.inventory-reservation-api-project.middlewares=inventory-reservation-api-strip-prefix-project"
-      - "traefik.http.middlewares.inventory-reservation-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.inventory-reservation-api-project.priority=125"
+      - "traefik.http.middlewares.inventory-reservation-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-reservation"
+      - "traefik.http.routers.inventory-reservation-api-project.priority=126"
+
+      - "traefik.http.routers.inventory-reservation-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-reservation-api-management.entrypoints=web"
+      - "traefik.http.routers.inventory-reservation-api-management.service=inventory-reservation-api"
+      - "traefik.http.routers.inventory-reservation-api-management.middlewares=inventory-reservation-api-strip-prefix-management"
+      - "traefik.http.middlewares.inventory-reservation-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.inventory-reservation-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.inventory-reservation-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.inventory-reservation-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.inventory-reservation-api-redirect.redirectregex.replacement=`/api/inventory-reservation/$$1`"
       - "traefik.http.middlewares.inventory-reservation-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -871,6 +974,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -879,23 +986,30 @@ services:
       - "traefik.http.routers.inventory-valuation-api.entrypoints=web"
       - "traefik.http.routers.inventory-valuation-api.service=inventory-valuation-api"
 
-      - "traefik.http.services.inventory-valuation-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.inventory-valuation-api.loadbalancer.server.port=4208"
       - "traefik.http.services.inventory-valuation-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.inventory-valuation-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.inventory-valuation-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.inventory-valuation-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.inventory-valuation-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-valuation-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-valuation`)"
       - "traefik.http.routers.inventory-valuation-api-project.entrypoints=web"
       - "traefik.http.routers.inventory-valuation-api-project.service=inventory-valuation-api"
       - "traefik.http.routers.inventory-valuation-api-project.middlewares=inventory-valuation-api-strip-prefix-project"
-      - "traefik.http.middlewares.inventory-valuation-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.inventory-valuation-api-project.priority=125"
+      - "traefik.http.middlewares.inventory-valuation-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-valuation"
+      - "traefik.http.routers.inventory-valuation-api-project.priority=124"
+
+      - "traefik.http.routers.inventory-valuation-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.inventory-valuation-api-management.entrypoints=web"
+      - "traefik.http.routers.inventory-valuation-api-management.service=inventory-valuation-api"
+      - "traefik.http.routers.inventory-valuation-api-management.middlewares=inventory-valuation-api-strip-prefix-management"
+      - "traefik.http.middlewares.inventory-valuation-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.inventory-valuation-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.inventory-valuation-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.inventory-valuation-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.inventory-valuation-api-redirect.redirectregex.replacement=`/api/inventory-valuation/$$1`"
       - "traefik.http.middlewares.inventory-valuation-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -949,6 +1063,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -957,23 +1075,30 @@ services:
       - "traefik.http.routers.multi-location-api.entrypoints=web"
       - "traefik.http.routers.multi-location-api.service=multi-location-api"
 
-      - "traefik.http.services.multi-location-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.multi-location-api.loadbalancer.server.port=4211"
       - "traefik.http.services.multi-location-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.multi-location-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.multi-location-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.multi-location-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.multi-location-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.multi-location-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/multi-location`)"
       - "traefik.http.routers.multi-location-api-project.entrypoints=web"
       - "traefik.http.routers.multi-location-api-project.service=multi-location-api"
       - "traefik.http.routers.multi-location-api-project.middlewares=multi-location-api-strip-prefix-project"
-      - "traefik.http.middlewares.multi-location-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.multi-location-api-project.priority=125"
+      - "traefik.http.middlewares.multi-location-api-strip-prefix-project.stripprefix.prefixes=/api/multi-location"
+      - "traefik.http.routers.multi-location-api-project.priority=119"
+
+      - "traefik.http.routers.multi-location-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.multi-location-api-management.entrypoints=web"
+      - "traefik.http.routers.multi-location-api-management.service=multi-location-api"
+      - "traefik.http.routers.multi-location-api-management.middlewares=multi-location-api-strip-prefix-management"
+      - "traefik.http.middlewares.multi-location-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.multi-location-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.multi-location-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.multi-location-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.multi-location-api-redirect.redirectregex.replacement=`/api/multi-location/$$1`"
       - "traefik.http.middlewares.multi-location-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -1027,6 +1152,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -1035,23 +1164,30 @@ services:
       - "traefik.http.routers.product-catalog-api.entrypoints=web"
       - "traefik.http.routers.product-catalog-api.service=product-catalog-api"
 
-      - "traefik.http.services.product-catalog-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.product-catalog-api.loadbalancer.server.port=4204"
       - "traefik.http.services.product-catalog-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.product-catalog-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.product-catalog-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.product-catalog-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.product-catalog-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.product-catalog-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/product-catalog`)"
       - "traefik.http.routers.product-catalog-api-project.entrypoints=web"
       - "traefik.http.routers.product-catalog-api-project.service=product-catalog-api"
       - "traefik.http.routers.product-catalog-api-project.middlewares=product-catalog-api-strip-prefix-project"
-      - "traefik.http.middlewares.product-catalog-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.product-catalog-api-project.priority=125"
+      - "traefik.http.middlewares.product-catalog-api-strip-prefix-project.stripprefix.prefixes=/api/product-catalog"
+      - "traefik.http.routers.product-catalog-api-project.priority=120"
+
+      - "traefik.http.routers.product-catalog-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.product-catalog-api-management.entrypoints=web"
+      - "traefik.http.routers.product-catalog-api-management.service=product-catalog-api"
+      - "traefik.http.routers.product-catalog-api-management.middlewares=product-catalog-api-strip-prefix-management"
+      - "traefik.http.middlewares.product-catalog-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.product-catalog-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.product-catalog-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.product-catalog-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.product-catalog-api-redirect.redirectregex.replacement=`/api/product-catalog/$$1`"
       - "traefik.http.middlewares.product-catalog-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -1105,6 +1241,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -1113,23 +1253,30 @@ services:
       - "traefik.http.routers.sku-management-api.entrypoints=web"
       - "traefik.http.routers.sku-management-api.service=sku-management-api"
 
-      - "traefik.http.services.sku-management-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.sku-management-api.loadbalancer.server.port=4205"
       - "traefik.http.services.sku-management-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.sku-management-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.sku-management-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.sku-management-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.sku-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.sku-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/sku-management`)"
       - "traefik.http.routers.sku-management-api-project.entrypoints=web"
       - "traefik.http.routers.sku-management-api-project.service=sku-management-api"
       - "traefik.http.routers.sku-management-api-project.middlewares=sku-management-api-strip-prefix-project"
-      - "traefik.http.middlewares.sku-management-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.sku-management-api-project.priority=125"
+      - "traefik.http.middlewares.sku-management-api-strip-prefix-project.stripprefix.prefixes=/api/sku-management"
+      - "traefik.http.routers.sku-management-api-project.priority=119"
+
+      - "traefik.http.routers.sku-management-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.sku-management-api-management.entrypoints=web"
+      - "traefik.http.routers.sku-management-api-management.service=sku-management-api"
+      - "traefik.http.routers.sku-management-api-management.middlewares=sku-management-api-strip-prefix-management"
+      - "traefik.http.middlewares.sku-management-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.sku-management-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.sku-management-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.sku-management-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.sku-management-api-redirect.redirectregex.replacement=`/api/sku-management/$$1`"
       - "traefik.http.middlewares.sku-management-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -1183,6 +1330,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -1191,23 +1342,30 @@ services:
       - "traefik.http.routers.stock-adjustment-api.entrypoints=web"
       - "traefik.http.routers.stock-adjustment-api.service=stock-adjustment-api"
 
-      - "traefik.http.services.stock-adjustment-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.stock-adjustment-api.loadbalancer.server.port=4216"
       - "traefik.http.services.stock-adjustment-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.stock-adjustment-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.stock-adjustment-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.stock-adjustment-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.stock-adjustment-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.stock-adjustment-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/stock-adjustment`)"
       - "traefik.http.routers.stock-adjustment-api-project.entrypoints=web"
       - "traefik.http.routers.stock-adjustment-api-project.service=stock-adjustment-api"
       - "traefik.http.routers.stock-adjustment-api-project.middlewares=stock-adjustment-api-strip-prefix-project"
-      - "traefik.http.middlewares.stock-adjustment-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.stock-adjustment-api-project.priority=125"
+      - "traefik.http.middlewares.stock-adjustment-api-strip-prefix-project.stripprefix.prefixes=/api/stock-adjustment"
+      - "traefik.http.routers.stock-adjustment-api-project.priority=121"
+
+      - "traefik.http.routers.stock-adjustment-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.stock-adjustment-api-management.entrypoints=web"
+      - "traefik.http.routers.stock-adjustment-api-management.service=stock-adjustment-api"
+      - "traefik.http.routers.stock-adjustment-api-management.middlewares=stock-adjustment-api-strip-prefix-management"
+      - "traefik.http.middlewares.stock-adjustment-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.stock-adjustment-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.stock-adjustment-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.stock-adjustment-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.stock-adjustment-api-redirect.redirectregex.replacement=`/api/stock-adjustment/$$1`"
       - "traefik.http.middlewares.stock-adjustment-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -1261,6 +1419,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -1269,23 +1431,30 @@ services:
       - "traefik.http.routers.stock-control-api.entrypoints=web"
       - "traefik.http.routers.stock-control-api.service=stock-control-api"
 
-      - "traefik.http.services.stock-control-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.stock-control-api.loadbalancer.server.port=4202"
       - "traefik.http.services.stock-control-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.stock-control-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.stock-control-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.stock-control-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.stock-control-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.stock-control-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/stock-control`)"
       - "traefik.http.routers.stock-control-api-project.entrypoints=web"
       - "traefik.http.routers.stock-control-api-project.service=stock-control-api"
       - "traefik.http.routers.stock-control-api-project.middlewares=stock-control-api-strip-prefix-project"
-      - "traefik.http.middlewares.stock-control-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.stock-control-api-project.priority=125"
+      - "traefik.http.middlewares.stock-control-api-strip-prefix-project.stripprefix.prefixes=/api/stock-control"
+      - "traefik.http.routers.stock-control-api-project.priority=118"
+
+      - "traefik.http.routers.stock-control-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.stock-control-api-management.entrypoints=web"
+      - "traefik.http.routers.stock-control-api-management.service=stock-control-api"
+      - "traefik.http.routers.stock-control-api-management.middlewares=stock-control-api-strip-prefix-management"
+      - "traefik.http.middlewares.stock-control-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.stock-control-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.stock-control-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.stock-control-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.stock-control-api-redirect.redirectregex.replacement=`/api/stock-control/$$1`"
       - "traefik.http.middlewares.stock-control-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -1339,6 +1508,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -1347,23 +1520,30 @@ services:
       - "traefik.http.routers.stock-movement-api.entrypoints=web"
       - "traefik.http.routers.stock-movement-api.service=stock-movement-api"
 
-      - "traefik.http.services.stock-movement-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.stock-movement-api.loadbalancer.server.port=4207"
       - "traefik.http.services.stock-movement-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.stock-movement-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.stock-movement-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.stock-movement-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.stock-movement-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.stock-movement-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/stock-movement`)"
       - "traefik.http.routers.stock-movement-api-project.entrypoints=web"
       - "traefik.http.routers.stock-movement-api-project.service=stock-movement-api"
       - "traefik.http.routers.stock-movement-api-project.middlewares=stock-movement-api-strip-prefix-project"
-      - "traefik.http.middlewares.stock-movement-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
-      - "traefik.http.routers.stock-movement-api-project.priority=125"
+      - "traefik.http.middlewares.stock-movement-api-strip-prefix-project.stripprefix.prefixes=/api/stock-movement"
+      - "traefik.http.routers.stock-movement-api-project.priority=119"
+
+      - "traefik.http.routers.stock-movement-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.stock-movement-api-management.entrypoints=web"
+      - "traefik.http.routers.stock-movement-api-management.service=stock-movement-api"
+      - "traefik.http.routers.stock-movement-api-management.middlewares=stock-movement-api-strip-prefix-management"
+      - "traefik.http.middlewares.stock-movement-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.stock-movement-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.stock-movement-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.stock-movement-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.stock-movement-api-redirect.redirectregex.replacement=`/api/stock-movement/$$1`"
       - "traefik.http.middlewares.stock-movement-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -1417,6 +1597,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_inventory?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -1425,23 +1609,30 @@ services:
       - "traefik.http.routers.warehouse-management-api.entrypoints=web"
       - "traefik.http.routers.warehouse-management-api.service=warehouse-management-api"
 
-      - "traefik.http.services.warehouse-management-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.warehouse-management-api.loadbalancer.server.port=4201"
       - "traefik.http.services.warehouse-management-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.warehouse-management-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.warehouse-management-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.warehouse-management-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.warehouse-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.warehouse-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/warehouse-management`)"
       - "traefik.http.routers.warehouse-management-api-project.entrypoints=web"
       - "traefik.http.routers.warehouse-management-api-project.service=warehouse-management-api"
       - "traefik.http.routers.warehouse-management-api-project.middlewares=warehouse-management-api-strip-prefix-project"
-      - "traefik.http.middlewares.warehouse-management-api-strip-prefix-project.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.middlewares.warehouse-management-api-strip-prefix-project.stripprefix.prefixes=/api/warehouse-management"
       - "traefik.http.routers.warehouse-management-api-project.priority=125"
+
+      - "traefik.http.routers.warehouse-management-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/inventory-management`)"
+      - "traefik.http.routers.warehouse-management-api-management.entrypoints=web"
+      - "traefik.http.routers.warehouse-management-api-management.service=warehouse-management-api"
+      - "traefik.http.routers.warehouse-management-api-management.middlewares=warehouse-management-api-strip-prefix-management"
+      - "traefik.http.middlewares.warehouse-management-api-strip-prefix-management.stripprefix.prefixes=/api/inventory-management"
+      - "traefik.http.routers.warehouse-management-api-management.priority=125"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.warehouse-management-api-redirect.redirectregex.regex=^`/inventory-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.warehouse-management-api-redirect.redirectregex.replacement=`/api/inventory-management/$$1`"
+      - "traefik.http.middlewares.warehouse-management-api-redirect.redirectregex.replacement=`/api/warehouse-management/$$1`"
       - "traefik.http.middlewares.warehouse-management-api-redirect.redirectregex.permanent=true"
 
     networks:

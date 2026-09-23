@@ -9,7 +9,7 @@
 # PORT DEFINITIONS - Change these to change ports everywhere
 # =============================================================================
 x-backend-port: &backend-port 4109
-x-frontend-port: &frontend-port 3020
+x-frontend-port: &frontend-port 80
 
 # =============================================================================
 # MEMORY LIMITS
@@ -60,6 +60,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_hr?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -68,23 +72,30 @@ services:
       - "traefik.http.routers.benefits-administration-api.entrypoints=web"
       - "traefik.http.routers.benefits-administration-api.service=benefits-administration-api"
 
-      - "traefik.http.services.benefits-administration-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.benefits-administration-api.loadbalancer.server.port=4105"
       - "traefik.http.services.benefits-administration-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.benefits-administration-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.benefits-administration-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.benefits-administration-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.benefits-administration-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.benefits-administration-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/benefits-administration`)"
       - "traefik.http.routers.benefits-administration-api-project.entrypoints=web"
       - "traefik.http.routers.benefits-administration-api-project.service=benefits-administration-api"
       - "traefik.http.routers.benefits-administration-api-project.middlewares=benefits-administration-api-strip-prefix-project"
-      - "traefik.http.middlewares.benefits-administration-api-strip-prefix-project.stripprefix.prefixes=/api/hr-management"
-      - "traefik.http.routers.benefits-administration-api-project.priority=118"
+      - "traefik.http.middlewares.benefits-administration-api-strip-prefix-project.stripprefix.prefixes=/api/benefits-administration"
+      - "traefik.http.routers.benefits-administration-api-project.priority=128"
+
+      - "traefik.http.routers.benefits-administration-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.benefits-administration-api-management.entrypoints=web"
+      - "traefik.http.routers.benefits-administration-api-management.service=benefits-administration-api"
+      - "traefik.http.routers.benefits-administration-api-management.middlewares=benefits-administration-api-strip-prefix-management"
+      - "traefik.http.middlewares.benefits-administration-api-strip-prefix-management.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.routers.benefits-administration-api-management.priority=118"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.benefits-administration-api-redirect.redirectregex.regex=^`/hr-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.benefits-administration-api-redirect.redirectregex.replacement=`/api/hr-management/$$1`"
+      - "traefik.http.middlewares.benefits-administration-api-redirect.redirectregex.replacement=`/api/benefits-administration/$$1`"
       - "traefik.http.middlewares.benefits-administration-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -138,6 +149,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_hr?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -146,23 +161,30 @@ services:
       - "traefik.http.routers.compensation-api.entrypoints=web"
       - "traefik.http.routers.compensation-api.service=compensation-api"
 
-      - "traefik.http.services.compensation-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.compensation-api.loadbalancer.server.port=4106"
       - "traefik.http.services.compensation-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.compensation-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.compensation-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.compensation-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.compensation-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.compensation-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/compensation`)"
       - "traefik.http.routers.compensation-api-project.entrypoints=web"
       - "traefik.http.routers.compensation-api-project.service=compensation-api"
       - "traefik.http.routers.compensation-api-project.middlewares=compensation-api-strip-prefix-project"
-      - "traefik.http.middlewares.compensation-api-strip-prefix-project.stripprefix.prefixes=/api/hr-management"
-      - "traefik.http.routers.compensation-api-project.priority=118"
+      - "traefik.http.middlewares.compensation-api-strip-prefix-project.stripprefix.prefixes=/api/compensation"
+      - "traefik.http.routers.compensation-api-project.priority=117"
+
+      - "traefik.http.routers.compensation-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.compensation-api-management.entrypoints=web"
+      - "traefik.http.routers.compensation-api-management.service=compensation-api"
+      - "traefik.http.routers.compensation-api-management.middlewares=compensation-api-strip-prefix-management"
+      - "traefik.http.middlewares.compensation-api-strip-prefix-management.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.routers.compensation-api-management.priority=118"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.compensation-api-redirect.redirectregex.regex=^`/hr-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.compensation-api-redirect.redirectregex.replacement=`/api/hr-management/$$1`"
+      - "traefik.http.middlewares.compensation-api-redirect.redirectregex.replacement=`/api/compensation/$$1`"
       - "traefik.http.middlewares.compensation-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -216,6 +238,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_hr?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -224,23 +250,30 @@ services:
       - "traefik.http.routers.compliance-api.entrypoints=web"
       - "traefik.http.routers.compliance-api.service=compliance-api"
 
-      - "traefik.http.services.compliance-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.compliance-api.loadbalancer.server.port=4108"
       - "traefik.http.services.compliance-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.compliance-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.compliance-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.compliance-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.compliance-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.compliance-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/compliance`)"
       - "traefik.http.routers.compliance-api-project.entrypoints=web"
       - "traefik.http.routers.compliance-api-project.service=compliance-api"
       - "traefik.http.routers.compliance-api-project.middlewares=compliance-api-strip-prefix-project"
-      - "traefik.http.middlewares.compliance-api-strip-prefix-project.stripprefix.prefixes=/api/hr-management"
-      - "traefik.http.routers.compliance-api-project.priority=118"
+      - "traefik.http.middlewares.compliance-api-strip-prefix-project.stripprefix.prefixes=/api/compliance"
+      - "traefik.http.routers.compliance-api-project.priority=115"
+
+      - "traefik.http.routers.compliance-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.compliance-api-management.entrypoints=web"
+      - "traefik.http.routers.compliance-api-management.service=compliance-api"
+      - "traefik.http.routers.compliance-api-management.middlewares=compliance-api-strip-prefix-management"
+      - "traefik.http.middlewares.compliance-api-strip-prefix-management.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.routers.compliance-api-management.priority=118"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.compliance-api-redirect.redirectregex.regex=^`/hr-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.compliance-api-redirect.redirectregex.replacement=`/api/hr-management/$$1`"
+      - "traefik.http.middlewares.compliance-api-redirect.redirectregex.replacement=`/api/compliance/$$1`"
       - "traefik.http.middlewares.compliance-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -294,6 +327,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_hr?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -302,23 +339,30 @@ services:
       - "traefik.http.routers.employee-portal-api.entrypoints=web"
       - "traefik.http.routers.employee-portal-api.service=employee-portal-api"
 
-      - "traefik.http.services.employee-portal-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.employee-portal-api.loadbalancer.server.port=4110"
       - "traefik.http.services.employee-portal-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.employee-portal-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.employee-portal-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.employee-portal-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.employee-portal-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.employee-portal-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/employee-portal`)"
       - "traefik.http.routers.employee-portal-api-project.entrypoints=web"
       - "traefik.http.routers.employee-portal-api-project.service=employee-portal-api"
       - "traefik.http.routers.employee-portal-api-project.middlewares=employee-portal-api-strip-prefix-project"
-      - "traefik.http.middlewares.employee-portal-api-strip-prefix-project.stripprefix.prefixes=/api/hr-management"
-      - "traefik.http.routers.employee-portal-api-project.priority=118"
+      - "traefik.http.middlewares.employee-portal-api-strip-prefix-project.stripprefix.prefixes=/api/employee-portal"
+      - "traefik.http.routers.employee-portal-api-project.priority=120"
+
+      - "traefik.http.routers.employee-portal-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.employee-portal-api-management.entrypoints=web"
+      - "traefik.http.routers.employee-portal-api-management.service=employee-portal-api"
+      - "traefik.http.routers.employee-portal-api-management.middlewares=employee-portal-api-strip-prefix-management"
+      - "traefik.http.middlewares.employee-portal-api-strip-prefix-management.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.routers.employee-portal-api-management.priority=118"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.employee-portal-api-redirect.redirectregex.regex=^`/hr-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.employee-portal-api-redirect.redirectregex.replacement=`/api/hr-management/$$1`"
+      - "traefik.http.middlewares.employee-portal-api-redirect.redirectregex.replacement=`/api/employee-portal/$$1`"
       - "traefik.http.middlewares.employee-portal-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -372,6 +416,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_hr?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -380,23 +428,30 @@ services:
       - "traefik.http.routers.employee-records-api.entrypoints=web"
       - "traefik.http.routers.employee-records-api.service=employee-records-api"
 
-      - "traefik.http.services.employee-records-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.employee-records-api.loadbalancer.server.port=4100"
       - "traefik.http.services.employee-records-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.employee-records-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.employee-records-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.employee-records-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.employee-records-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.employee-records-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/employee-records`)"
       - "traefik.http.routers.employee-records-api-project.entrypoints=web"
       - "traefik.http.routers.employee-records-api-project.service=employee-records-api"
       - "traefik.http.routers.employee-records-api-project.middlewares=employee-records-api-strip-prefix-project"
-      - "traefik.http.middlewares.employee-records-api-strip-prefix-project.stripprefix.prefixes=/api/hr-management"
-      - "traefik.http.routers.employee-records-api-project.priority=118"
+      - "traefik.http.middlewares.employee-records-api-strip-prefix-project.stripprefix.prefixes=/api/employee-records"
+      - "traefik.http.routers.employee-records-api-project.priority=121"
+
+      - "traefik.http.routers.employee-records-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.employee-records-api-management.entrypoints=web"
+      - "traefik.http.routers.employee-records-api-management.service=employee-records-api"
+      - "traefik.http.routers.employee-records-api-management.middlewares=employee-records-api-strip-prefix-management"
+      - "traefik.http.middlewares.employee-records-api-strip-prefix-management.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.routers.employee-records-api-management.priority=118"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.employee-records-api-redirect.redirectregex.regex=^`/hr-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.employee-records-api-redirect.redirectregex.replacement=`/api/hr-management/$$1`"
+      - "traefik.http.middlewares.employee-records-api-redirect.redirectregex.replacement=`/api/employee-records/$$1`"
       - "traefik.http.middlewares.employee-records-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -450,6 +505,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_hr?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -458,23 +517,30 @@ services:
       - "traefik.http.routers.hr-analytics-api.entrypoints=web"
       - "traefik.http.routers.hr-analytics-api.service=hr-analytics-api"
 
-      - "traefik.http.services.hr-analytics-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.hr-analytics-api.loadbalancer.server.port=4111"
       - "traefik.http.services.hr-analytics-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.hr-analytics-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.hr-analytics-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.hr-analytics-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.hr-analytics-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.hr-analytics-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-analytics`)"
       - "traefik.http.routers.hr-analytics-api-project.entrypoints=web"
       - "traefik.http.routers.hr-analytics-api-project.service=hr-analytics-api"
       - "traefik.http.routers.hr-analytics-api-project.middlewares=hr-analytics-api-strip-prefix-project"
-      - "traefik.http.middlewares.hr-analytics-api-strip-prefix-project.stripprefix.prefixes=/api/hr-management"
-      - "traefik.http.routers.hr-analytics-api-project.priority=118"
+      - "traefik.http.middlewares.hr-analytics-api-strip-prefix-project.stripprefix.prefixes=/api/hr-analytics"
+      - "traefik.http.routers.hr-analytics-api-project.priority=117"
+
+      - "traefik.http.routers.hr-analytics-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.hr-analytics-api-management.entrypoints=web"
+      - "traefik.http.routers.hr-analytics-api-management.service=hr-analytics-api"
+      - "traefik.http.routers.hr-analytics-api-management.middlewares=hr-analytics-api-strip-prefix-management"
+      - "traefik.http.middlewares.hr-analytics-api-strip-prefix-management.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.routers.hr-analytics-api-management.priority=118"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.hr-analytics-api-redirect.redirectregex.regex=^`/hr-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.hr-analytics-api-redirect.redirectregex.replacement=`/api/hr-management/$$1`"
+      - "traefik.http.middlewares.hr-analytics-api-redirect.redirectregex.replacement=`/api/hr-analytics/$$1`"
       - "traefik.http.middlewares.hr-analytics-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -518,13 +584,13 @@ services:
         - "traefik.http.routers.hr-portal-app.priority=114"
         - "traefik.http.routers.hr-portal-app.middlewares=hr-portal-app-strip-prefix"
         - "traefik.http.middlewares.hr-portal-app-strip-prefix.stripprefix.prefixes=/hr-portal-app"
-        - "traefik.http.services.hr-portal-app.loadbalancer.server.port=*frontend-port"
+        - "traefik.http.services.hr-portal-app.loadbalancer.server.port=80"
         - "traefik.docker.network=tdk_erp_system_traefik-public"
     networks:
         - tdk_erp_system_traefik-public
         - tdk_erp_system_backend
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3020"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:80"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -559,6 +625,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_hr?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -567,23 +637,30 @@ services:
       - "traefik.http.routers.onboarding-api.entrypoints=web"
       - "traefik.http.routers.onboarding-api.service=onboarding-api"
 
-      - "traefik.http.services.onboarding-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.onboarding-api.loadbalancer.server.port=4102"
       - "traefik.http.services.onboarding-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.onboarding-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.onboarding-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.onboarding-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.onboarding-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.onboarding-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/onboarding`)"
       - "traefik.http.routers.onboarding-api-project.entrypoints=web"
       - "traefik.http.routers.onboarding-api-project.service=onboarding-api"
       - "traefik.http.routers.onboarding-api-project.middlewares=onboarding-api-strip-prefix-project"
-      - "traefik.http.middlewares.onboarding-api-strip-prefix-project.stripprefix.prefixes=/api/hr-management"
-      - "traefik.http.routers.onboarding-api-project.priority=118"
+      - "traefik.http.middlewares.onboarding-api-strip-prefix-project.stripprefix.prefixes=/api/onboarding"
+      - "traefik.http.routers.onboarding-api-project.priority=115"
+
+      - "traefik.http.routers.onboarding-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.onboarding-api-management.entrypoints=web"
+      - "traefik.http.routers.onboarding-api-management.service=onboarding-api"
+      - "traefik.http.routers.onboarding-api-management.middlewares=onboarding-api-strip-prefix-management"
+      - "traefik.http.middlewares.onboarding-api-strip-prefix-management.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.routers.onboarding-api-management.priority=118"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.onboarding-api-redirect.redirectregex.regex=^`/hr-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.onboarding-api-redirect.redirectregex.replacement=`/api/hr-management/$$1`"
+      - "traefik.http.middlewares.onboarding-api-redirect.redirectregex.replacement=`/api/onboarding/$$1`"
       - "traefik.http.middlewares.onboarding-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -637,6 +714,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_hr?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -645,23 +726,30 @@ services:
       - "traefik.http.routers.performance-management-api.entrypoints=web"
       - "traefik.http.routers.performance-management-api.service=performance-management-api"
 
-      - "traefik.http.services.performance-management-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.performance-management-api.loadbalancer.server.port=4103"
       - "traefik.http.services.performance-management-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.performance-management-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.performance-management-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.performance-management-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.performance-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.performance-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/performance-management`)"
       - "traefik.http.routers.performance-management-api-project.entrypoints=web"
       - "traefik.http.routers.performance-management-api-project.service=performance-management-api"
       - "traefik.http.routers.performance-management-api-project.middlewares=performance-management-api-strip-prefix-project"
-      - "traefik.http.middlewares.performance-management-api-strip-prefix-project.stripprefix.prefixes=/api/hr-management"
-      - "traefik.http.routers.performance-management-api-project.priority=118"
+      - "traefik.http.middlewares.performance-management-api-strip-prefix-project.stripprefix.prefixes=/api/performance-management"
+      - "traefik.http.routers.performance-management-api-project.priority=127"
+
+      - "traefik.http.routers.performance-management-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.performance-management-api-management.entrypoints=web"
+      - "traefik.http.routers.performance-management-api-management.service=performance-management-api"
+      - "traefik.http.routers.performance-management-api-management.middlewares=performance-management-api-strip-prefix-management"
+      - "traefik.http.middlewares.performance-management-api-strip-prefix-management.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.routers.performance-management-api-management.priority=118"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.performance-management-api-redirect.redirectregex.regex=^`/hr-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.performance-management-api-redirect.redirectregex.replacement=`/api/hr-management/$$1`"
+      - "traefik.http.middlewares.performance-management-api-redirect.redirectregex.replacement=`/api/performance-management/$$1`"
       - "traefik.http.middlewares.performance-management-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -715,6 +803,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_hr?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -723,23 +815,30 @@ services:
       - "traefik.http.routers.recruitment-api.entrypoints=web"
       - "traefik.http.routers.recruitment-api.service=recruitment-api"
 
-      - "traefik.http.services.recruitment-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.recruitment-api.loadbalancer.server.port=4101"
       - "traefik.http.services.recruitment-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.recruitment-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.recruitment-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.recruitment-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.recruitment-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.recruitment-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/recruitment`)"
       - "traefik.http.routers.recruitment-api-project.entrypoints=web"
       - "traefik.http.routers.recruitment-api-project.service=recruitment-api"
       - "traefik.http.routers.recruitment-api-project.middlewares=recruitment-api-strip-prefix-project"
-      - "traefik.http.middlewares.recruitment-api-strip-prefix-project.stripprefix.prefixes=/api/hr-management"
-      - "traefik.http.routers.recruitment-api-project.priority=118"
+      - "traefik.http.middlewares.recruitment-api-strip-prefix-project.stripprefix.prefixes=/api/recruitment"
+      - "traefik.http.routers.recruitment-api-project.priority=116"
+
+      - "traefik.http.routers.recruitment-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.recruitment-api-management.entrypoints=web"
+      - "traefik.http.routers.recruitment-api-management.service=recruitment-api"
+      - "traefik.http.routers.recruitment-api-management.middlewares=recruitment-api-strip-prefix-management"
+      - "traefik.http.middlewares.recruitment-api-strip-prefix-management.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.routers.recruitment-api-management.priority=118"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.recruitment-api-redirect.redirectregex.regex=^`/hr-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.recruitment-api-redirect.redirectregex.replacement=`/api/hr-management/$$1`"
+      - "traefik.http.middlewares.recruitment-api-redirect.redirectregex.replacement=`/api/recruitment/$$1`"
       - "traefik.http.middlewares.recruitment-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -793,6 +892,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_hr?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -801,23 +904,30 @@ services:
       - "traefik.http.routers.time-tracking-api.entrypoints=web"
       - "traefik.http.routers.time-tracking-api.service=time-tracking-api"
 
-      - "traefik.http.services.time-tracking-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.time-tracking-api.loadbalancer.server.port=4104"
       - "traefik.http.services.time-tracking-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.time-tracking-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.time-tracking-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.time-tracking-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.time-tracking-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.time-tracking-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/time-tracking`)"
       - "traefik.http.routers.time-tracking-api-project.entrypoints=web"
       - "traefik.http.routers.time-tracking-api-project.service=time-tracking-api"
       - "traefik.http.routers.time-tracking-api-project.middlewares=time-tracking-api-strip-prefix-project"
-      - "traefik.http.middlewares.time-tracking-api-strip-prefix-project.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.middlewares.time-tracking-api-strip-prefix-project.stripprefix.prefixes=/api/time-tracking"
       - "traefik.http.routers.time-tracking-api-project.priority=118"
+
+      - "traefik.http.routers.time-tracking-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.time-tracking-api-management.entrypoints=web"
+      - "traefik.http.routers.time-tracking-api-management.service=time-tracking-api"
+      - "traefik.http.routers.time-tracking-api-management.middlewares=time-tracking-api-strip-prefix-management"
+      - "traefik.http.middlewares.time-tracking-api-strip-prefix-management.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.routers.time-tracking-api-management.priority=118"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.time-tracking-api-redirect.redirectregex.regex=^`/hr-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.time-tracking-api-redirect.redirectregex.replacement=`/api/hr-management/$$1`"
+      - "traefik.http.middlewares.time-tracking-api-redirect.redirectregex.replacement=`/api/time-tracking/$$1`"
       - "traefik.http.middlewares.time-tracking-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -871,6 +981,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_hr?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -879,23 +993,30 @@ services:
       - "traefik.http.routers.training-api.entrypoints=web"
       - "traefik.http.routers.training-api.service=training-api"
 
-      - "traefik.http.services.training-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.training-api.loadbalancer.server.port=4107"
       - "traefik.http.services.training-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.training-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.training-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.training-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.training-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.training-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/training`)"
       - "traefik.http.routers.training-api-project.entrypoints=web"
       - "traefik.http.routers.training-api-project.service=training-api"
       - "traefik.http.routers.training-api-project.middlewares=training-api-strip-prefix-project"
-      - "traefik.http.middlewares.training-api-strip-prefix-project.stripprefix.prefixes=/api/hr-management"
-      - "traefik.http.routers.training-api-project.priority=118"
+      - "traefik.http.middlewares.training-api-strip-prefix-project.stripprefix.prefixes=/api/training"
+      - "traefik.http.routers.training-api-project.priority=113"
+
+      - "traefik.http.routers.training-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.training-api-management.entrypoints=web"
+      - "traefik.http.routers.training-api-management.service=training-api"
+      - "traefik.http.routers.training-api-management.middlewares=training-api-strip-prefix-management"
+      - "traefik.http.middlewares.training-api-strip-prefix-management.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.routers.training-api-management.priority=118"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.training-api-redirect.redirectregex.regex=^`/hr-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.training-api-redirect.redirectregex.replacement=`/api/hr-management/$$1`"
+      - "traefik.http.middlewares.training-api-redirect.redirectregex.replacement=`/api/training/$$1`"
       - "traefik.http.middlewares.training-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -949,6 +1070,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_hr?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -957,23 +1082,30 @@ services:
       - "traefik.http.routers.workforce-planning-api.entrypoints=web"
       - "traefik.http.routers.workforce-planning-api.service=workforce-planning-api"
 
-      - "traefik.http.services.workforce-planning-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.workforce-planning-api.loadbalancer.server.port=4109"
       - "traefik.http.services.workforce-planning-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.workforce-planning-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.workforce-planning-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.workforce-planning-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.workforce-planning-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.workforce-planning-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/workforce-planning`)"
       - "traefik.http.routers.workforce-planning-api-project.entrypoints=web"
       - "traefik.http.routers.workforce-planning-api-project.service=workforce-planning-api"
       - "traefik.http.routers.workforce-planning-api-project.middlewares=workforce-planning-api-strip-prefix-project"
-      - "traefik.http.middlewares.workforce-planning-api-strip-prefix-project.stripprefix.prefixes=/api/hr-management"
-      - "traefik.http.routers.workforce-planning-api-project.priority=118"
+      - "traefik.http.middlewares.workforce-planning-api-strip-prefix-project.stripprefix.prefixes=/api/workforce-planning"
+      - "traefik.http.routers.workforce-planning-api-project.priority=123"
+
+      - "traefik.http.routers.workforce-planning-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/hr-management`)"
+      - "traefik.http.routers.workforce-planning-api-management.entrypoints=web"
+      - "traefik.http.routers.workforce-planning-api-management.service=workforce-planning-api"
+      - "traefik.http.routers.workforce-planning-api-management.middlewares=workforce-planning-api-strip-prefix-management"
+      - "traefik.http.middlewares.workforce-planning-api-strip-prefix-management.stripprefix.prefixes=/api/hr-management"
+      - "traefik.http.routers.workforce-planning-api-management.priority=118"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.workforce-planning-api-redirect.redirectregex.regex=^`/hr-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.workforce-planning-api-redirect.redirectregex.replacement=`/api/hr-management/$$1`"
+      - "traefik.http.middlewares.workforce-planning-api-redirect.redirectregex.replacement=`/api/workforce-planning/$$1`"
       - "traefik.http.middlewares.workforce-planning-api-redirect.redirectregex.permanent=true"
 
     networks:

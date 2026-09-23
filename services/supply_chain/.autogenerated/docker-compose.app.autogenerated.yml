@@ -9,7 +9,7 @@
 # PORT DEFINITIONS - Change these to change ports everywhere
 # =============================================================================
 x-backend-port: &backend-port 4505
-x-frontend-port: &frontend-port 3060
+x-frontend-port: &frontend-port 80
 
 # =============================================================================
 # MEMORY LIMITS
@@ -60,6 +60,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_supply_chain?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -68,23 +72,30 @@ services:
       - "traefik.http.routers.demand-planning-api.entrypoints=web"
       - "traefik.http.routers.demand-planning-api.service=demand-planning-api"
 
-      - "traefik.http.services.demand-planning-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.demand-planning-api.loadbalancer.server.port=4506"
       - "traefik.http.services.demand-planning-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.demand-planning-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.demand-planning-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.demand-planning-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.demand-planning-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.demand-planning-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/demand-planning`)"
       - "traefik.http.routers.demand-planning-api-project.entrypoints=web"
       - "traefik.http.routers.demand-planning-api-project.service=demand-planning-api"
       - "traefik.http.routers.demand-planning-api-project.middlewares=demand-planning-api-strip-prefix-project"
-      - "traefik.http.middlewares.demand-planning-api-strip-prefix-project.stripprefix.prefixes=/api/supply_chain-management"
-      - "traefik.http.routers.demand-planning-api-project.priority=128"
+      - "traefik.http.middlewares.demand-planning-api-strip-prefix-project.stripprefix.prefixes=/api/demand-planning"
+      - "traefik.http.routers.demand-planning-api-project.priority=120"
+
+      - "traefik.http.routers.demand-planning-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.demand-planning-api-management.entrypoints=web"
+      - "traefik.http.routers.demand-planning-api-management.service=demand-planning-api"
+      - "traefik.http.routers.demand-planning-api-management.middlewares=demand-planning-api-strip-prefix-management"
+      - "traefik.http.middlewares.demand-planning-api-strip-prefix-management.stripprefix.prefixes=/api/supply_chain-management"
+      - "traefik.http.routers.demand-planning-api-management.priority=128"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.demand-planning-api-redirect.redirectregex.regex=^`/supply_chain-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.demand-planning-api-redirect.redirectregex.replacement=`/api/supply_chain-management/$$1`"
+      - "traefik.http.middlewares.demand-planning-api-redirect.redirectregex.replacement=`/api/demand-planning/$$1`"
       - "traefik.http.middlewares.demand-planning-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -138,6 +149,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_supply_chain?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -146,23 +161,30 @@ services:
       - "traefik.http.routers.logistics-api.entrypoints=web"
       - "traefik.http.routers.logistics-api.service=logistics-api"
 
-      - "traefik.http.services.logistics-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.logistics-api.loadbalancer.server.port=4504"
       - "traefik.http.services.logistics-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.logistics-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.logistics-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.logistics-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.logistics-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.logistics-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/logistics`)"
       - "traefik.http.routers.logistics-api-project.entrypoints=web"
       - "traefik.http.routers.logistics-api-project.service=logistics-api"
       - "traefik.http.routers.logistics-api-project.middlewares=logistics-api-strip-prefix-project"
-      - "traefik.http.middlewares.logistics-api-strip-prefix-project.stripprefix.prefixes=/api/supply_chain-management"
-      - "traefik.http.routers.logistics-api-project.priority=128"
+      - "traefik.http.middlewares.logistics-api-strip-prefix-project.stripprefix.prefixes=/api/logistics"
+      - "traefik.http.routers.logistics-api-project.priority=114"
+
+      - "traefik.http.routers.logistics-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.logistics-api-management.entrypoints=web"
+      - "traefik.http.routers.logistics-api-management.service=logistics-api"
+      - "traefik.http.routers.logistics-api-management.middlewares=logistics-api-strip-prefix-management"
+      - "traefik.http.middlewares.logistics-api-strip-prefix-management.stripprefix.prefixes=/api/supply_chain-management"
+      - "traefik.http.routers.logistics-api-management.priority=128"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.logistics-api-redirect.redirectregex.regex=^`/supply_chain-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.logistics-api-redirect.redirectregex.replacement=`/api/supply_chain-management/$$1`"
+      - "traefik.http.middlewares.logistics-api-redirect.redirectregex.replacement=`/api/logistics/$$1`"
       - "traefik.http.middlewares.logistics-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -216,6 +238,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_supply_chain?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -224,23 +250,30 @@ services:
       - "traefik.http.routers.procurement-api.entrypoints=web"
       - "traefik.http.routers.procurement-api.service=procurement-api"
 
-      - "traefik.http.services.procurement-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.procurement-api.loadbalancer.server.port=4500"
       - "traefik.http.services.procurement-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.procurement-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.procurement-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.procurement-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.procurement-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.procurement-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/procurement`)"
       - "traefik.http.routers.procurement-api-project.entrypoints=web"
       - "traefik.http.routers.procurement-api-project.service=procurement-api"
       - "traefik.http.routers.procurement-api-project.middlewares=procurement-api-strip-prefix-project"
-      - "traefik.http.middlewares.procurement-api-strip-prefix-project.stripprefix.prefixes=/api/supply_chain-management"
-      - "traefik.http.routers.procurement-api-project.priority=128"
+      - "traefik.http.middlewares.procurement-api-strip-prefix-project.stripprefix.prefixes=/api/procurement"
+      - "traefik.http.routers.procurement-api-project.priority=116"
+
+      - "traefik.http.routers.procurement-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.procurement-api-management.entrypoints=web"
+      - "traefik.http.routers.procurement-api-management.service=procurement-api"
+      - "traefik.http.routers.procurement-api-management.middlewares=procurement-api-strip-prefix-management"
+      - "traefik.http.middlewares.procurement-api-strip-prefix-management.stripprefix.prefixes=/api/supply_chain-management"
+      - "traefik.http.routers.procurement-api-management.priority=128"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.procurement-api-redirect.redirectregex.regex=^`/supply_chain-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.procurement-api-redirect.redirectregex.replacement=`/api/supply_chain-management/$$1`"
+      - "traefik.http.middlewares.procurement-api-redirect.redirectregex.replacement=`/api/procurement/$$1`"
       - "traefik.http.middlewares.procurement-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -294,6 +327,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_supply_chain?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -302,23 +339,30 @@ services:
       - "traefik.http.routers.purchase-order-api.entrypoints=web"
       - "traefik.http.routers.purchase-order-api.service=purchase-order-api"
 
-      - "traefik.http.services.purchase-order-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.purchase-order-api.loadbalancer.server.port=4502"
       - "traefik.http.services.purchase-order-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.purchase-order-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.purchase-order-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.purchase-order-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.purchase-order-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.purchase-order-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/purchase-order`)"
       - "traefik.http.routers.purchase-order-api-project.entrypoints=web"
       - "traefik.http.routers.purchase-order-api-project.service=purchase-order-api"
       - "traefik.http.routers.purchase-order-api-project.middlewares=purchase-order-api-strip-prefix-project"
-      - "traefik.http.middlewares.purchase-order-api-strip-prefix-project.stripprefix.prefixes=/api/supply_chain-management"
-      - "traefik.http.routers.purchase-order-api-project.priority=128"
+      - "traefik.http.middlewares.purchase-order-api-strip-prefix-project.stripprefix.prefixes=/api/purchase-order"
+      - "traefik.http.routers.purchase-order-api-project.priority=119"
+
+      - "traefik.http.routers.purchase-order-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.purchase-order-api-management.entrypoints=web"
+      - "traefik.http.routers.purchase-order-api-management.service=purchase-order-api"
+      - "traefik.http.routers.purchase-order-api-management.middlewares=purchase-order-api-strip-prefix-management"
+      - "traefik.http.middlewares.purchase-order-api-strip-prefix-management.stripprefix.prefixes=/api/supply_chain-management"
+      - "traefik.http.routers.purchase-order-api-management.priority=128"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.purchase-order-api-redirect.redirectregex.regex=^`/supply_chain-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.purchase-order-api-redirect.redirectregex.replacement=`/api/supply_chain-management/$$1`"
+      - "traefik.http.middlewares.purchase-order-api-redirect.redirectregex.replacement=`/api/purchase-order/$$1`"
       - "traefik.http.middlewares.purchase-order-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -372,6 +416,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_supply_chain?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -380,23 +428,30 @@ services:
       - "traefik.http.routers.receiving-api.entrypoints=web"
       - "traefik.http.routers.receiving-api.service=receiving-api"
 
-      - "traefik.http.services.receiving-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.receiving-api.loadbalancer.server.port=4509"
       - "traefik.http.services.receiving-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.receiving-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.receiving-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.receiving-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.receiving-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.receiving-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/receiving`)"
       - "traefik.http.routers.receiving-api-project.entrypoints=web"
       - "traefik.http.routers.receiving-api-project.service=receiving-api"
       - "traefik.http.routers.receiving-api-project.middlewares=receiving-api-strip-prefix-project"
-      - "traefik.http.middlewares.receiving-api-strip-prefix-project.stripprefix.prefixes=/api/supply_chain-management"
-      - "traefik.http.routers.receiving-api-project.priority=128"
+      - "traefik.http.middlewares.receiving-api-strip-prefix-project.stripprefix.prefixes=/api/receiving"
+      - "traefik.http.routers.receiving-api-project.priority=114"
+
+      - "traefik.http.routers.receiving-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.receiving-api-management.entrypoints=web"
+      - "traefik.http.routers.receiving-api-management.service=receiving-api"
+      - "traefik.http.routers.receiving-api-management.middlewares=receiving-api-strip-prefix-management"
+      - "traefik.http.middlewares.receiving-api-strip-prefix-management.stripprefix.prefixes=/api/supply_chain-management"
+      - "traefik.http.routers.receiving-api-management.priority=128"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.receiving-api-redirect.redirectregex.regex=^`/supply_chain-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.receiving-api-redirect.redirectregex.replacement=`/api/supply_chain-management/$$1`"
+      - "traefik.http.middlewares.receiving-api-redirect.redirectregex.replacement=`/api/receiving/$$1`"
       - "traefik.http.middlewares.receiving-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -450,6 +505,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_supply_chain?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -458,23 +517,30 @@ services:
       - "traefik.http.routers.shipping-api.entrypoints=web"
       - "traefik.http.routers.shipping-api.service=shipping-api"
 
-      - "traefik.http.services.shipping-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.shipping-api.loadbalancer.server.port=4508"
       - "traefik.http.services.shipping-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.shipping-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.shipping-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.shipping-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.shipping-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.shipping-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/shipping`)"
       - "traefik.http.routers.shipping-api-project.entrypoints=web"
       - "traefik.http.routers.shipping-api-project.service=shipping-api"
       - "traefik.http.routers.shipping-api-project.middlewares=shipping-api-strip-prefix-project"
-      - "traefik.http.middlewares.shipping-api-strip-prefix-project.stripprefix.prefixes=/api/supply_chain-management"
-      - "traefik.http.routers.shipping-api-project.priority=128"
+      - "traefik.http.middlewares.shipping-api-strip-prefix-project.stripprefix.prefixes=/api/shipping"
+      - "traefik.http.routers.shipping-api-project.priority=113"
+
+      - "traefik.http.routers.shipping-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.shipping-api-management.entrypoints=web"
+      - "traefik.http.routers.shipping-api-management.service=shipping-api"
+      - "traefik.http.routers.shipping-api-management.middlewares=shipping-api-strip-prefix-management"
+      - "traefik.http.middlewares.shipping-api-strip-prefix-management.stripprefix.prefixes=/api/supply_chain-management"
+      - "traefik.http.routers.shipping-api-management.priority=128"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.shipping-api-redirect.redirectregex.regex=^`/supply_chain-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.shipping-api-redirect.redirectregex.replacement=`/api/supply_chain-management/$$1`"
+      - "traefik.http.middlewares.shipping-api-redirect.redirectregex.replacement=`/api/shipping/$$1`"
       - "traefik.http.middlewares.shipping-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -528,6 +594,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_supply_chain?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -536,23 +606,30 @@ services:
       - "traefik.http.routers.supplier-management-api.entrypoints=web"
       - "traefik.http.routers.supplier-management-api.service=supplier-management-api"
 
-      - "traefik.http.services.supplier-management-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.supplier-management-api.loadbalancer.server.port=4501"
       - "traefik.http.services.supplier-management-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.supplier-management-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.supplier-management-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.supplier-management-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.supplier-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.supplier-management-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supplier-management`)"
       - "traefik.http.routers.supplier-management-api-project.entrypoints=web"
       - "traefik.http.routers.supplier-management-api-project.service=supplier-management-api"
       - "traefik.http.routers.supplier-management-api-project.middlewares=supplier-management-api-strip-prefix-project"
-      - "traefik.http.middlewares.supplier-management-api-strip-prefix-project.stripprefix.prefixes=/api/supply_chain-management"
-      - "traefik.http.routers.supplier-management-api-project.priority=128"
+      - "traefik.http.middlewares.supplier-management-api-strip-prefix-project.stripprefix.prefixes=/api/supplier-management"
+      - "traefik.http.routers.supplier-management-api-project.priority=124"
+
+      - "traefik.http.routers.supplier-management-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.supplier-management-api-management.entrypoints=web"
+      - "traefik.http.routers.supplier-management-api-management.service=supplier-management-api"
+      - "traefik.http.routers.supplier-management-api-management.middlewares=supplier-management-api-strip-prefix-management"
+      - "traefik.http.middlewares.supplier-management-api-strip-prefix-management.stripprefix.prefixes=/api/supply_chain-management"
+      - "traefik.http.routers.supplier-management-api-management.priority=128"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.supplier-management-api-redirect.redirectregex.regex=^`/supply_chain-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.supplier-management-api-redirect.redirectregex.replacement=`/api/supply_chain-management/$$1`"
+      - "traefik.http.middlewares.supplier-management-api-redirect.redirectregex.replacement=`/api/supplier-management/$$1`"
       - "traefik.http.middlewares.supplier-management-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -606,6 +683,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_supply_chain?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -614,23 +695,30 @@ services:
       - "traefik.http.routers.supplier-performance-api.entrypoints=web"
       - "traefik.http.routers.supplier-performance-api.service=supplier-performance-api"
 
-      - "traefik.http.services.supplier-performance-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.supplier-performance-api.loadbalancer.server.port=4510"
       - "traefik.http.services.supplier-performance-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.supplier-performance-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.supplier-performance-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.supplier-performance-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.supplier-performance-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.supplier-performance-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supplier-performance`)"
       - "traefik.http.routers.supplier-performance-api-project.entrypoints=web"
       - "traefik.http.routers.supplier-performance-api-project.service=supplier-performance-api"
       - "traefik.http.routers.supplier-performance-api-project.middlewares=supplier-performance-api-strip-prefix-project"
-      - "traefik.http.middlewares.supplier-performance-api-strip-prefix-project.stripprefix.prefixes=/api/supply_chain-management"
-      - "traefik.http.routers.supplier-performance-api-project.priority=128"
+      - "traefik.http.middlewares.supplier-performance-api-strip-prefix-project.stripprefix.prefixes=/api/supplier-performance"
+      - "traefik.http.routers.supplier-performance-api-project.priority=125"
+
+      - "traefik.http.routers.supplier-performance-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.supplier-performance-api-management.entrypoints=web"
+      - "traefik.http.routers.supplier-performance-api-management.service=supplier-performance-api"
+      - "traefik.http.routers.supplier-performance-api-management.middlewares=supplier-performance-api-strip-prefix-management"
+      - "traefik.http.middlewares.supplier-performance-api-strip-prefix-management.stripprefix.prefixes=/api/supply_chain-management"
+      - "traefik.http.routers.supplier-performance-api-management.priority=128"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.supplier-performance-api-redirect.redirectregex.regex=^`/supply_chain-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.supplier-performance-api-redirect.redirectregex.replacement=`/api/supply_chain-management/$$1`"
+      - "traefik.http.middlewares.supplier-performance-api-redirect.redirectregex.replacement=`/api/supplier-performance/$$1`"
       - "traefik.http.middlewares.supplier-performance-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -684,6 +772,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_supply_chain?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -692,23 +784,30 @@ services:
       - "traefik.http.routers.supply-chain-analytics-api.entrypoints=web"
       - "traefik.http.routers.supply-chain-analytics-api.service=supply-chain-analytics-api"
 
-      - "traefik.http.services.supply-chain-analytics-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.supply-chain-analytics-api.loadbalancer.server.port=4507"
       - "traefik.http.services.supply-chain-analytics-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.supply-chain-analytics-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.supply-chain-analytics-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.supply-chain-analytics-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.supply-chain-analytics-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.supply-chain-analytics-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply-chain-analytics`)"
       - "traefik.http.routers.supply-chain-analytics-api-project.entrypoints=web"
       - "traefik.http.routers.supply-chain-analytics-api-project.service=supply-chain-analytics-api"
       - "traefik.http.routers.supply-chain-analytics-api-project.middlewares=supply-chain-analytics-api-strip-prefix-project"
-      - "traefik.http.middlewares.supply-chain-analytics-api-strip-prefix-project.stripprefix.prefixes=/api/supply_chain-management"
-      - "traefik.http.routers.supply-chain-analytics-api-project.priority=128"
+      - "traefik.http.middlewares.supply-chain-analytics-api-strip-prefix-project.stripprefix.prefixes=/api/supply-chain-analytics"
+      - "traefik.http.routers.supply-chain-analytics-api-project.priority=127"
+
+      - "traefik.http.routers.supply-chain-analytics-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.supply-chain-analytics-api-management.entrypoints=web"
+      - "traefik.http.routers.supply-chain-analytics-api-management.service=supply-chain-analytics-api"
+      - "traefik.http.routers.supply-chain-analytics-api-management.middlewares=supply-chain-analytics-api-strip-prefix-management"
+      - "traefik.http.middlewares.supply-chain-analytics-api-strip-prefix-management.stripprefix.prefixes=/api/supply_chain-management"
+      - "traefik.http.routers.supply-chain-analytics-api-management.priority=128"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.supply-chain-analytics-api-redirect.redirectregex.regex=^`/supply_chain-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.supply-chain-analytics-api-redirect.redirectregex.replacement=`/api/supply_chain-management/$$1`"
+      - "traefik.http.middlewares.supply-chain-analytics-api-redirect.redirectregex.replacement=`/api/supply-chain-analytics/$$1`"
       - "traefik.http.middlewares.supply-chain-analytics-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -752,13 +851,13 @@ services:
         - "traefik.http.routers.supply-chain-app.priority=117"
         - "traefik.http.routers.supply-chain-app.middlewares=supply-chain-app-strip-prefix"
         - "traefik.http.middlewares.supply-chain-app-strip-prefix.stripprefix.prefixes=/supply-chain-app"
-        - "traefik.http.services.supply-chain-app.loadbalancer.server.port=*frontend-port"
+        - "traefik.http.services.supply-chain-app.loadbalancer.server.port=80"
         - "traefik.docker.network=tdk_erp_system_traefik-public"
     networks:
         - tdk_erp_system_traefik-public
         - tdk_erp_system_backend
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3060"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:80"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -793,6 +892,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_supply_chain?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -801,23 +904,30 @@ services:
       - "traefik.http.routers.supply-chain-planning-api.entrypoints=web"
       - "traefik.http.routers.supply-chain-planning-api.service=supply-chain-planning-api"
 
-      - "traefik.http.services.supply-chain-planning-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.supply-chain-planning-api.loadbalancer.server.port=4503"
       - "traefik.http.services.supply-chain-planning-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.supply-chain-planning-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.supply-chain-planning-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.supply-chain-planning-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.supply-chain-planning-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.supply-chain-planning-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply-chain-planning`)"
       - "traefik.http.routers.supply-chain-planning-api-project.entrypoints=web"
       - "traefik.http.routers.supply-chain-planning-api-project.service=supply-chain-planning-api"
       - "traefik.http.routers.supply-chain-planning-api-project.middlewares=supply-chain-planning-api-strip-prefix-project"
-      - "traefik.http.middlewares.supply-chain-planning-api-strip-prefix-project.stripprefix.prefixes=/api/supply_chain-management"
-      - "traefik.http.routers.supply-chain-planning-api-project.priority=128"
+      - "traefik.http.middlewares.supply-chain-planning-api-strip-prefix-project.stripprefix.prefixes=/api/supply-chain-planning"
+      - "traefik.http.routers.supply-chain-planning-api-project.priority=126"
+
+      - "traefik.http.routers.supply-chain-planning-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.supply-chain-planning-api-management.entrypoints=web"
+      - "traefik.http.routers.supply-chain-planning-api-management.service=supply-chain-planning-api"
+      - "traefik.http.routers.supply-chain-planning-api-management.middlewares=supply-chain-planning-api-strip-prefix-management"
+      - "traefik.http.middlewares.supply-chain-planning-api-strip-prefix-management.stripprefix.prefixes=/api/supply_chain-management"
+      - "traefik.http.routers.supply-chain-planning-api-management.priority=128"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.supply-chain-planning-api-redirect.redirectregex.regex=^`/supply_chain-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.supply-chain-planning-api-redirect.redirectregex.replacement=`/api/supply_chain-management/$$1`"
+      - "traefik.http.middlewares.supply-chain-planning-api-redirect.redirectregex.replacement=`/api/supply-chain-planning/$$1`"
       - "traefik.http.middlewares.supply-chain-planning-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -871,6 +981,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_supply_chain?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -879,23 +993,30 @@ services:
       - "traefik.http.routers.supply-chain-risk-api.entrypoints=web"
       - "traefik.http.routers.supply-chain-risk-api.service=supply-chain-risk-api"
 
-      - "traefik.http.services.supply-chain-risk-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.supply-chain-risk-api.loadbalancer.server.port=4511"
       - "traefik.http.services.supply-chain-risk-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.supply-chain-risk-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.supply-chain-risk-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.supply-chain-risk-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.supply-chain-risk-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.supply-chain-risk-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply-chain-risk`)"
       - "traefik.http.routers.supply-chain-risk-api-project.entrypoints=web"
       - "traefik.http.routers.supply-chain-risk-api-project.service=supply-chain-risk-api"
       - "traefik.http.routers.supply-chain-risk-api-project.middlewares=supply-chain-risk-api-strip-prefix-project"
-      - "traefik.http.middlewares.supply-chain-risk-api-strip-prefix-project.stripprefix.prefixes=/api/supply_chain-management"
-      - "traefik.http.routers.supply-chain-risk-api-project.priority=128"
+      - "traefik.http.middlewares.supply-chain-risk-api-strip-prefix-project.stripprefix.prefixes=/api/supply-chain-risk"
+      - "traefik.http.routers.supply-chain-risk-api-project.priority=122"
+
+      - "traefik.http.routers.supply-chain-risk-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.supply-chain-risk-api-management.entrypoints=web"
+      - "traefik.http.routers.supply-chain-risk-api-management.service=supply-chain-risk-api"
+      - "traefik.http.routers.supply-chain-risk-api-management.middlewares=supply-chain-risk-api-strip-prefix-management"
+      - "traefik.http.middlewares.supply-chain-risk-api-strip-prefix-management.stripprefix.prefixes=/api/supply_chain-management"
+      - "traefik.http.routers.supply-chain-risk-api-management.priority=128"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.supply-chain-risk-api-redirect.redirectregex.regex=^`/supply_chain-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.supply-chain-risk-api-redirect.redirectregex.replacement=`/api/supply_chain-management/$$1`"
+      - "traefik.http.middlewares.supply-chain-risk-api-redirect.redirectregex.replacement=`/api/supply-chain-risk/$$1`"
       - "traefik.http.middlewares.supply-chain-risk-api-redirect.redirectregex.permanent=true"
 
     networks:
@@ -949,6 +1070,10 @@ services:
       - TILT_NATS_URL=nats://tdk_erp_system_nats:4222
       - NODE_ENV=development
       - DATABASE_URL=postgresql://tdk_erp_system:${DB_PASSWORD}@tdk_erp_system_postgres:5432/tdk_erp_system_supply_chain?schema=public
+      # Per-project escape hatch: set AUTO_MIGRATE=false in the project root .env
+      # to skip Prisma auto-migration at container boot (e.g. while diagnosing a
+      # migration/CLI issue) without touching the generator or any service code.
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       - AUTH_MODE=identity-service
       - IDENTITY_RESOURCE_URL=${IDENTITY_RESOURCE_URL:-None}
     labels:
@@ -957,23 +1082,30 @@ services:
       - "traefik.http.routers.vendor-portal-api.entrypoints=web"
       - "traefik.http.routers.vendor-portal-api.service=vendor-portal-api"
 
-      - "traefik.http.services.vendor-portal-api.loadbalancer.server.port=*backend-port"
+      - "traefik.http.services.vendor-portal-api.loadbalancer.server.port=4505"
       - "traefik.http.services.vendor-portal-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.vendor-portal-api.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.vendor-portal-api.loadbalancer.healthcheck.timeout=5s"
       - "traefik.http.services.vendor-portal-api.loadbalancer.healthcheck.followredirects=false"
       - "traefik.docker.network=tdk_erp_system_traefik-public"
 
-      - "traefik.http.routers.vendor-portal-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.vendor-portal-api-project.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/vendor-portal`)"
       - "traefik.http.routers.vendor-portal-api-project.entrypoints=web"
       - "traefik.http.routers.vendor-portal-api-project.service=vendor-portal-api"
       - "traefik.http.routers.vendor-portal-api-project.middlewares=vendor-portal-api-strip-prefix-project"
-      - "traefik.http.middlewares.vendor-portal-api-strip-prefix-project.stripprefix.prefixes=/api/supply_chain-management"
-      - "traefik.http.routers.vendor-portal-api-project.priority=128"
+      - "traefik.http.middlewares.vendor-portal-api-strip-prefix-project.stripprefix.prefixes=/api/vendor-portal"
+      - "traefik.http.routers.vendor-portal-api-project.priority=118"
+
+      - "traefik.http.routers.vendor-portal-api-management.rule=Host(`api.tdk-erp-system.localhost`) && PathPrefix(`/api/supply_chain-management`)"
+      - "traefik.http.routers.vendor-portal-api-management.entrypoints=web"
+      - "traefik.http.routers.vendor-portal-api-management.service=vendor-portal-api"
+      - "traefik.http.routers.vendor-portal-api-management.middlewares=vendor-portal-api-strip-prefix-management"
+      - "traefik.http.middlewares.vendor-portal-api-strip-prefix-management.stripprefix.prefixes=/api/supply_chain-management"
+      - "traefik.http.routers.vendor-portal-api-management.priority=128"
 
       # Redirect middleware for URL restructuring: old path -> new path
       - "traefik.http.middlewares.vendor-portal-api-redirect.redirectregex.regex=^`/supply_chain-management/api/v1/(.*)`"
-      - "traefik.http.middlewares.vendor-portal-api-redirect.redirectregex.replacement=`/api/supply_chain-management/$$1`"
+      - "traefik.http.middlewares.vendor-portal-api-redirect.redirectregex.replacement=`/api/vendor-portal/$$1`"
       - "traefik.http.middlewares.vendor-portal-api-redirect.redirectregex.permanent=true"
 
     networks:

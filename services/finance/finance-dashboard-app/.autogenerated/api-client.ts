@@ -14,7 +14,7 @@ import { createApiClient } from '@" + _NPM_SCOPE + "'/platform-api-client';
  * ```
  */
 export const apiClient = createApiClient({
-  baseURL: import.meta.env.VITE_API_URL || 'http://api.tdk-project.localhost/api/finance-management',
+  baseURL: import.meta.env.VITE_API_URL || 'http://api.tdk-erp-system.localhost/api/finance-management',
   withAuth: true,
 });
 

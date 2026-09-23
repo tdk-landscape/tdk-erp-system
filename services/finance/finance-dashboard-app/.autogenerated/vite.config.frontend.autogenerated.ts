@@ -56,17 +56,17 @@ export default defineConfig({
     },
     proxy: {
       '': {
-        target: 'http://tdk-project.localhost/api/finance-management',
+        target: 'http://tdk-erp-system.localhost/api/finance-management',
         changeOrigin: true,
         secure: false,
       },
       '/health': {
-        target: 'http://tdk-project.localhost/api/finance-management',
+        target: 'http://tdk-erp-system.localhost/api/finance-management',
         changeOrigin: true,
         secure: false,
       },
       '/trpc': {
-        target: 'http://tdk-project.localhost/api/finance-management',
+        target: 'http://tdk-erp-system.localhost/api/finance-management',
         changeOrigin: true,
         secure: false,
       },
