@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "bun run src/index.ts",
     "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "test": "bun test",
+    "build": "tsc",
+    "start": "bun run dist/index.js"
   },
   "dependencies": {
     "hono": "^4.0.0",
