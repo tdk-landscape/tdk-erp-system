@@ -1,0 +1,10 @@
+appName: accounts-payable-api
+appType: backend
+stack: finance
+port: 4011
+apiPath: /api/accounts-payable
+dependencies:
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

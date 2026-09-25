@@ -1,0 +1,10 @@
+appName: quality-control-api
+appType: backend
+stack: manufacturing
+port: 4402
+apiPath: /api/quality-control
+dependencies:
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health

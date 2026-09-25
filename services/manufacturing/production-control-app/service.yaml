@@ -1,0 +1,11 @@
+appName: production-control-app
+appType: frontend
+stack: manufacturing
+port: 3050
+basePath: /production-control-app
+dependencies:
+  - production-planning-api
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health

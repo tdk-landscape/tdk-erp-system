@@ -1,0 +1,10 @@
+appName: time-tracking-api
+appType: backend
+stack: hr
+port: 4104
+apiPath: /api/time-tracking
+dependencies:
+domain: hr
+healthCheck:
+  enabled: True
+  path: /health

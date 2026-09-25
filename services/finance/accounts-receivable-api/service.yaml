@@ -1,0 +1,10 @@
+appName: accounts-receivable-api
+appType: backend
+stack: finance
+port: 4012
+apiPath: /api/accounts-receivable
+dependencies:
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

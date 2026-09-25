@@ -1,0 +1,11 @@
+appName: inventory-management-app
+appType: frontend
+stack: inventory
+port: 3040
+basePath: /inventory-management-app
+dependencies:
+  - inventory-management-api
+domain: inventory
+healthCheck:
+  enabled: True
+  path: /health

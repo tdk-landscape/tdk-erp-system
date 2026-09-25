@@ -1,0 +1,10 @@
+appName: inventory-management-api
+appType: backend
+stack: inventory
+port: 4200
+apiPath: /api/inventory-management
+dependencies:
+domain: inventory
+healthCheck:
+  enabled: True
+  path: /health

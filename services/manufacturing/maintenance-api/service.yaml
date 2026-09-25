@@ -1,0 +1,10 @@
+appName: maintenance-api
+appType: backend
+stack: manufacturing
+port: 4403
+apiPath: /api/maintenance
+dependencies:
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health

@@ -1,0 +1,10 @@
+appName: cash-management-api
+appType: backend
+stack: finance
+port: 4018
+apiPath: /api/cash-management
+dependencies:
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

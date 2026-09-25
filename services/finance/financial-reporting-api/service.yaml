@@ -1,0 +1,10 @@
+appName: financial-reporting-api
+appType: backend
+stack: finance
+port: 4014
+apiPath: /api/financial-reporting
+dependencies:
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

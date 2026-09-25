@@ -1,0 +1,10 @@
+appName: compliance-api
+appType: backend
+stack: hr
+port: 4108
+apiPath: /api/compliance
+dependencies:
+domain: hr
+healthCheck:
+  enabled: True
+  path: /health

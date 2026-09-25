@@ -1,0 +1,10 @@
+appName: bom-management-api
+appType: backend
+stack: manufacturing
+port: 4404
+apiPath: /api/bom-management
+dependencies:
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health

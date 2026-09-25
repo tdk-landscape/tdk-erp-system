@@ -1,0 +1,10 @@
+appName: expense-management-api
+appType: backend
+stack: finance
+port: 4015
+apiPath: /api/expense-management
+dependencies:
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

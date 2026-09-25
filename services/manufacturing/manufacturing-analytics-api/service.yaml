@@ -1,0 +1,10 @@
+appName: manufacturing-analytics-api
+appType: backend
+stack: manufacturing
+port: 4414
+apiPath: /api/manufacturing-analytics
+dependencies:
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health

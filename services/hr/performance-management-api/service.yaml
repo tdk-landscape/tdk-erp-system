@@ -1,0 +1,10 @@
+appName: performance-management-api
+appType: backend
+stack: hr
+port: 4103
+apiPath: /api/performance-management
+dependencies:
+domain: hr
+healthCheck:
+  enabled: True
+  path: /health

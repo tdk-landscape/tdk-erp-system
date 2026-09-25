@@ -1,0 +1,10 @@
+appName: business-intelligence-api
+appType: backend
+stack: analytics
+port: 4600
+apiPath: /api/business-intelligence
+dependencies:
+domain: analytics
+healthCheck:
+  enabled: True
+  path: /health

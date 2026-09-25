@@ -1,0 +1,10 @@
+appName: financial-analytics-api
+appType: backend
+stack: finance
+port: 4020
+apiPath: /api/financial-analytics
+dependencies:
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

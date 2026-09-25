@@ -1,0 +1,10 @@
+appName: reporting-api
+appType: backend
+stack: analytics
+port: 4602
+apiPath: /api/reporting
+dependencies:
+domain: analytics
+healthCheck:
+  enabled: True
+  path: /health

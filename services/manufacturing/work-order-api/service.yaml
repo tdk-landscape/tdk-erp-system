@@ -1,0 +1,10 @@
+appName: work-order-api
+appType: backend
+stack: manufacturing
+port: 4405
+apiPath: /api/work-order
+dependencies:
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health

@@ -1,0 +1,10 @@
+appName: analytics-portal-api
+appType: backend
+stack: analytics
+port: 4606
+apiPath: /api/analytics-portal
+dependencies:
+domain: analytics
+healthCheck:
+  enabled: True
+  path: /health

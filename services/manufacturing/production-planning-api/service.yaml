@@ -1,0 +1,10 @@
+appName: production-planning-api
+appType: backend
+stack: manufacturing
+port: 4400
+apiPath: /api/production-planning
+dependencies:
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health

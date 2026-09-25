@@ -1,0 +1,10 @@
+appName: budgeting-api
+appType: backend
+stack: finance
+port: 4013
+apiPath: /api/budgeting
+dependencies:
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

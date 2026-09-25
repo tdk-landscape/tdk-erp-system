@@ -1,0 +1,10 @@
+appName: data-warehouse-api
+appType: backend
+stack: analytics
+port: 4601
+apiPath: /api/data-warehouse
+dependencies:
+domain: analytics
+healthCheck:
+  enabled: True
+  path: /health

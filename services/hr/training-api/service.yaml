@@ -1,0 +1,10 @@
+appName: training-api
+appType: backend
+stack: hr
+port: 4107
+apiPath: /api/training
+dependencies:
+domain: hr
+healthCheck:
+  enabled: True
+  path: /health

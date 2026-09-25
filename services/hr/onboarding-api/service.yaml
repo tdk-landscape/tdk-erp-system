@@ -1,0 +1,10 @@
+appName: onboarding-api
+appType: backend
+stack: hr
+port: 4102
+apiPath: /api/onboarding
+dependencies:
+domain: hr
+healthCheck:
+  enabled: True
+  path: /health

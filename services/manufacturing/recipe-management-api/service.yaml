@@ -1,0 +1,10 @@
+appName: recipe-management-api
+appType: backend
+stack: manufacturing
+port: 4411
+apiPath: /api/recipe-management
+dependencies:
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health

@@ -1,0 +1,10 @@
+appName: inventory-forecasting-api
+appType: backend
+stack: inventory
+port: 4206
+apiPath: /api/inventory-forecasting
+dependencies:
+domain: inventory
+healthCheck:
+  enabled: True
+  path: /health

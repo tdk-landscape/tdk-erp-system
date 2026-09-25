@@ -1,0 +1,10 @@
+appName: inventory-audit-api
+appType: backend
+stack: inventory
+port: 4210
+apiPath: /api/inventory-audit
+dependencies:
+domain: inventory
+healthCheck:
+  enabled: True
+  path: /health
