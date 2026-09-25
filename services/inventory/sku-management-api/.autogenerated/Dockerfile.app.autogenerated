@@ -89,7 +89,7 @@ COPY shared-platform-engineering/docker-templates/bun-hoisted-symlink-fix.sh /us
 RUN chmod +x /usr/local/bin/bun-hoisted-symlink-fix.sh && /usr/local/bin/bun-hoisted-symlink-fix.sh
 USER bun
 EXPOSE 4000
-CMD ["bun run start"]
+CMD ["bun", "run", "start"]
 
 FROM l4_backend_runtime AS production
 FROM l4_backend_runtime AS development
