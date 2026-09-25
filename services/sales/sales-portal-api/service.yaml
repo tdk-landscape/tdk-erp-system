@@ -1,0 +1,10 @@
+appName: sales-portal-api
+appType: backend
+stack: sales
+port: 4310
+apiPath: /api/sales-portal
+dependencies:
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health

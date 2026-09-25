@@ -1,0 +1,10 @@
+appName: procurement-api
+appType: backend
+stack: supply_chain
+port: 4500
+apiPath: /api/procurement
+dependencies:
+domain: supply_chain
+healthCheck:
+  enabled: True
+  path: /health

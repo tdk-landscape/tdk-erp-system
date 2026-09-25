@@ -1,0 +1,10 @@
+appName: supply-chain-planning-api
+appType: backend
+stack: supply_chain
+port: 4503
+apiPath: /api/supply-chain-planning
+dependencies:
+domain: supply_chain
+healthCheck:
+  enabled: True
+  path: /health

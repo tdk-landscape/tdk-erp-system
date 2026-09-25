@@ -1,0 +1,10 @@
+appName: quoting-api
+appType: backend
+stack: sales
+port: 4302
+apiPath: /api/quoting
+dependencies:
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health

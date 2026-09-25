@@ -1,0 +1,10 @@
+appName: invoice-generation-api
+appType: backend
+stack: sales
+port: 4314
+apiPath: /api/invoice-generation
+dependencies:
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health

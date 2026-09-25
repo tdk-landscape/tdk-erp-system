@@ -1,0 +1,11 @@
+appName: sales-crm-app
+appType: frontend
+stack: sales
+port: 3030
+basePath: /sales-crm-app
+dependencies:
+  - crm-api
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health

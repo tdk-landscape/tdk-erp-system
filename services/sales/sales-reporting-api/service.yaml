@@ -1,0 +1,10 @@
+appName: sales-reporting-api
+appType: backend
+stack: sales
+port: 4316
+apiPath: /api/sales-reporting
+dependencies:
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health

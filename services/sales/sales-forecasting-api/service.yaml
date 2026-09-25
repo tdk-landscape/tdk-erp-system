@@ -1,0 +1,10 @@
+appName: sales-forecasting-api
+appType: backend
+stack: sales
+port: 4304
+apiPath: /api/sales-forecasting
+dependencies:
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health

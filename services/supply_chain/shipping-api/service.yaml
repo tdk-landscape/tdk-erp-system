@@ -1,0 +1,10 @@
+appName: shipping-api
+appType: backend
+stack: supply_chain
+port: 4508
+apiPath: /api/shipping
+dependencies:
+domain: supply_chain
+healthCheck:
+  enabled: True
+  path: /health

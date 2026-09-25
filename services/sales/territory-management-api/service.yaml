@@ -1,0 +1,10 @@
+appName: territory-management-api
+appType: backend
+stack: sales
+port: 4309
+apiPath: /api/territory-management
+dependencies:
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health

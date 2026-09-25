@@ -1,0 +1,11 @@
+appName: supply-chain-app
+appType: frontend
+stack: supply_chain
+port: 3060
+basePath: /supply-chain-app
+dependencies:
+  - supply-chain-planning-api
+domain: supply_chain
+healthCheck:
+  enabled: True
+  path: /health

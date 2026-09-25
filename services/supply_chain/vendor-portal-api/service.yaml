@@ -1,0 +1,10 @@
+appName: vendor-portal-api
+appType: backend
+stack: supply_chain
+port: 4505
+apiPath: /api/vendor-portal
+dependencies:
+domain: supply_chain
+healthCheck:
+  enabled: True
+  path: /health

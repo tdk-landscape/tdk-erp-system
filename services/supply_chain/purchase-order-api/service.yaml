@@ -1,0 +1,10 @@
+appName: purchase-order-api
+appType: backend
+stack: supply_chain
+port: 4502
+apiPath: /api/purchase-order
+dependencies:
+domain: supply_chain
+healthCheck:
+  enabled: True
+  path: /health

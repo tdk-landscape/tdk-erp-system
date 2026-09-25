@@ -1,0 +1,10 @@
+appName: contract-management-api
+appType: backend
+stack: sales
+port: 4311
+apiPath: /api/contract-management
+dependencies:
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health

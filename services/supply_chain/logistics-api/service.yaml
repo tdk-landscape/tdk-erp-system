@@ -1,0 +1,10 @@
+appName: logistics-api
+appType: backend
+stack: supply_chain
+port: 4504
+apiPath: /api/logistics
+dependencies:
+domain: supply_chain
+healthCheck:
+  enabled: True
+  path: /health

@@ -1,0 +1,10 @@
+appName: crm-api
+appType: backend
+stack: sales
+port: 4300
+apiPath: /api/crm
+dependencies:
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health

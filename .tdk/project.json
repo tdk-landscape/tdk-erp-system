@@ -13,7 +13,9 @@
         "finance",
         "hr",
         "inventory",
-        "manufacturing"
+        "manufacturing",
+        "sales",
+        "supply_chain"
       ]
     },
     "alpha": {

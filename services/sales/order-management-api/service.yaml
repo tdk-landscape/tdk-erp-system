@@ -1,0 +1,10 @@
+appName: order-management-api
+appType: backend
+stack: sales
+port: 4301
+apiPath: /api/order-management
+dependencies:
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health
