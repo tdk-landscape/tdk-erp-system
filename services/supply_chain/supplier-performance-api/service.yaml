@@ -1,0 +1,10 @@
+appName: supplier-performance-api
+appType: backend
+stack: supply_chain
+port: 4510
+apiPath: /api/supplier-performance
+dependencies:
+domain: supply_chain
+healthCheck:
+  enabled: True
+  path: /health

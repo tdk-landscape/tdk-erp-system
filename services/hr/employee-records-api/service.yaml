@@ -1,0 +1,10 @@
+appName: employee-records-api
+appType: backend
+stack: hr
+port: 4100
+apiPath: /api/employee-records
+dependencies:
+domain: hr
+healthCheck:
+  enabled: True
+  path: /health

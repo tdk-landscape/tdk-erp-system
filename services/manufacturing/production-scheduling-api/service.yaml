@@ -1,0 +1,10 @@
+appName: production-scheduling-api
+appType: backend
+stack: manufacturing
+port: 4401
+apiPath: /api/production-scheduling
+dependencies:
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health

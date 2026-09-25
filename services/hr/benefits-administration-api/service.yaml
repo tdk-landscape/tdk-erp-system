@@ -1,0 +1,10 @@
+appName: benefits-administration-api
+appType: backend
+stack: hr
+port: 4105
+apiPath: /api/benefits-administration
+dependencies:
+domain: hr
+healthCheck:
+  enabled: True
+  path: /health

@@ -1,0 +1,10 @@
+appName: sales-performance-api
+appType: backend
+stack: sales
+port: 4318
+apiPath: /api/sales-performance
+dependencies:
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health

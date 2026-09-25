@@ -1,0 +1,11 @@
+appName: bi-dashboard-app
+appType: frontend
+stack: analytics
+port: 3070
+basePath: /bi-dashboard-app
+dependencies:
+  - business-intelligence-api
+domain: analytics
+healthCheck:
+  enabled: True
+  path: /health

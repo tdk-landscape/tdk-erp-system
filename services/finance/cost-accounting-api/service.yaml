@@ -1,0 +1,10 @@
+appName: cost-accounting-api
+appType: backend
+stack: finance
+port: 4022
+apiPath: /api/cost-accounting
+dependencies:
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

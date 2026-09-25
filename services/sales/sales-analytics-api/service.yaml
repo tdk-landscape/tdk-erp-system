@@ -1,0 +1,10 @@
+appName: sales-analytics-api
+appType: backend
+stack: sales
+port: 4307
+apiPath: /api/sales-analytics
+dependencies:
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health

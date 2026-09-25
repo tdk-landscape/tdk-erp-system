@@ -1,0 +1,10 @@
+appName: inventory-reporting-api
+appType: backend
+stack: inventory
+port: 4217
+apiPath: /api/inventory-reporting
+dependencies:
+domain: inventory
+healthCheck:
+  enabled: True
+  path: /health

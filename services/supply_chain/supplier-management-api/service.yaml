@@ -1,0 +1,10 @@
+appName: supplier-management-api
+appType: backend
+stack: supply_chain
+port: 4501
+apiPath: /api/supplier-management
+dependencies:
+domain: supply_chain
+healthCheck:
+  enabled: True
+  path: /health

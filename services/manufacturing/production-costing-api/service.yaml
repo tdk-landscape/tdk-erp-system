@@ -1,0 +1,10 @@
+appName: production-costing-api
+appType: backend
+stack: manufacturing
+port: 4413
+apiPath: /api/production-costing
+dependencies:
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health

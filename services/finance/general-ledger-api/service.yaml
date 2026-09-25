@@ -1,0 +1,10 @@
+appName: general-ledger-api
+appType: backend
+stack: finance
+port: 4010
+apiPath: /api/general-ledger
+dependencies:
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

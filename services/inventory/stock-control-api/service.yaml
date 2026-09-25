@@ -1,0 +1,10 @@
+appName: stock-control-api
+appType: backend
+stack: inventory
+port: 4202
+apiPath: /api/stock-control
+dependencies:
+domain: inventory
+healthCheck:
+  enabled: True
+  path: /health

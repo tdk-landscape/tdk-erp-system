@@ -1,0 +1,10 @@
+appName: shop-floor-control-api
+appType: backend
+stack: manufacturing
+port: 4406
+apiPath: /api/shop-floor-control
+dependencies:
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health

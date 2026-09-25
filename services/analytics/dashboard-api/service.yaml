@@ -1,0 +1,10 @@
+appName: dashboard-api
+appType: backend
+stack: analytics
+port: 4605
+apiPath: /api/dashboard
+dependencies:
+domain: analytics
+healthCheck:
+  enabled: True
+  path: /health

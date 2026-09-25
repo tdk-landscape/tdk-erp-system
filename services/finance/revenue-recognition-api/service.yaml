@@ -1,0 +1,10 @@
+appName: revenue-recognition-api
+appType: backend
+stack: finance
+port: 4023
+apiPath: /api/revenue-recognition
+dependencies:
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

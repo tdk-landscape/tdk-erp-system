@@ -1,0 +1,10 @@
+appName: demand-planning-api
+appType: backend
+stack: supply_chain
+port: 4506
+apiPath: /api/demand-planning
+dependencies:
+domain: supply_chain
+healthCheck:
+  enabled: True
+  path: /health

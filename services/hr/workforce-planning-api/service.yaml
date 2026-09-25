@@ -1,0 +1,10 @@
+appName: workforce-planning-api
+appType: backend
+stack: hr
+port: 4109
+apiPath: /api/workforce-planning
+dependencies:
+domain: hr
+healthCheck:
+  enabled: True
+  path: /health

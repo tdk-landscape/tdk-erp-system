@@ -39,7 +39,7 @@
     "elk": false,
     "debezium": false,
     "golden_image": true,
-    "verdaccio": false
+    "verdaccio": true
   },
   "discovery": {
     "paths": [

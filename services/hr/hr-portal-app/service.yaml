@@ -1,0 +1,11 @@
+appName: hr-portal-app
+appType: frontend
+stack: hr
+port: 3020
+basePath: /hr-portal-app
+dependencies:
+  - employee-portal-api
+domain: hr
+healthCheck:
+  enabled: True
+  path: /health

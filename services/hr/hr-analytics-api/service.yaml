@@ -1,0 +1,10 @@
+appName: hr-analytics-api
+appType: backend
+stack: hr
+port: 4111
+apiPath: /api/hr-analytics
+dependencies:
+domain: hr
+healthCheck:
+  enabled: True
+  path: /health

@@ -1,0 +1,10 @@
+appName: product-catalog-api
+appType: backend
+stack: inventory
+port: 4204
+apiPath: /api/product-catalog
+dependencies:
+domain: inventory
+healthCheck:
+  enabled: True
+  path: /health

@@ -1,0 +1,10 @@
+appName: asset-management-api
+appType: backend
+stack: finance
+port: 4017
+apiPath: /api/asset-management
+dependencies:
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

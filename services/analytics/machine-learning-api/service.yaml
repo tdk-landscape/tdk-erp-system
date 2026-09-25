@@ -1,0 +1,10 @@
+appName: machine-learning-api
+appType: backend
+stack: analytics
+port: 4607
+apiPath: /api/machine-learning
+dependencies:
+domain: analytics
+healthCheck:
+  enabled: True
+  path: /health

@@ -1,0 +1,10 @@
+appName: recruitment-api
+appType: backend
+stack: hr
+port: 4101
+apiPath: /api/recruitment
+dependencies:
+domain: hr
+healthCheck:
+  enabled: True
+  path: /health

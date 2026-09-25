@@ -1,0 +1,10 @@
+appName: inventory-valuation-api
+appType: backend
+stack: inventory
+port: 4208
+apiPath: /api/inventory-valuation
+dependencies:
+domain: inventory
+healthCheck:
+  enabled: True
+  path: /health

@@ -1,0 +1,10 @@
+appName: audit-trail-api
+appType: backend
+stack: finance
+port: 4024
+apiPath: /api/audit-trail
+dependencies:
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

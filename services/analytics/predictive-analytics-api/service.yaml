@@ -1,0 +1,10 @@
+appName: predictive-analytics-api
+appType: backend
+stack: analytics
+port: 4603
+apiPath: /api/predictive-analytics
+dependencies:
+domain: analytics
+healthCheck:
+  enabled: True
+  path: /health

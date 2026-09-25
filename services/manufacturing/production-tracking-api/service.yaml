@@ -1,0 +1,10 @@
+appName: production-tracking-api
+appType: backend
+stack: manufacturing
+port: 4408
+apiPath: /api/production-tracking
+dependencies:
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health

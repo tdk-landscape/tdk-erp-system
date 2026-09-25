@@ -1,0 +1,10 @@
+appName: payment-processing-api
+appType: backend
+stack: sales
+port: 4315
+apiPath: /api/payment-processing
+dependencies:
+domain: sales
+healthCheck:
+  enabled: True
+  path: /health

@@ -1,0 +1,11 @@
+appName: finance-dashboard-app
+appType: frontend
+stack: finance
+port: 3010
+basePath: /finance-dashboard-app
+dependencies:
+  - financial-analytics-api
+domain: finance
+healthCheck:
+  enabled: True
+  path: /health

@@ -1,0 +1,10 @@
+appName: lean-manufacturing-api
+appType: backend
+stack: manufacturing
+port: 4409
+apiPath: /api/lean-manufacturing
+dependencies:
+domain: manufacturing
+healthCheck:
+  enabled: True
+  path: /health
