@@ -2,6 +2,9 @@
 node_modules/
 bun.lockb
 .tdk/.tdk-out
+# Per-machine identifier used only for the Worker's license project-limit
+# tracking - regenerated automatically if missing, not meant to be shared.
+.tdk/.project-id
 # Build outputs
 dist/
 build/
