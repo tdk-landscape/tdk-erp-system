@@ -10,6 +10,10 @@
 ###############################################################################
 
 registry=https://registry.npmjs.org/
-@tdk-erp-system:registry=https://registry.npmjs.org/
-@tdk-landscape:registry=https://registry.npmjs.org/
-@identity:registry=https://registry.npmjs.org/
+@tdk-erp-system:registry=http://verdaccio:4873/
+@tdk-landscape:registry=http://verdaccio:4873/
+@identity:registry=http://verdaccio:4873/
+//verdaccio:4873/:username=admin
+//verdaccio:4873/:_password=YWRtaW4=
+//verdaccio:4873/:email=admin@example.com
+//verdaccio:4873/:always-auth=true
