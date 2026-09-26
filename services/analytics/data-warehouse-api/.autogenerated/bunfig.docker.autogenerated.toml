@@ -13,3 +13,8 @@
 linker = "isolated"
 linkWorkspacePackages = true
 registry = "https://registry.npmjs.org"
+
+[install.scopes]
+"@tdk-erp-system" = { url = "http://verdaccio:4873/" }
+"@tdk-landscape" = { url = "http://verdaccio:4873/" }
+"@identity" = { url = "http://verdaccio:4873/" }
