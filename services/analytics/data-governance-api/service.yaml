@@ -8,3 +8,6 @@ domain: analytics
 healthCheck:
   enabled: True
   path: /health
+sablier:
+  deferStart: True
+  enable: True
