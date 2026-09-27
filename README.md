@@ -15,7 +15,7 @@
   &nbsp;&nbsp;/&nbsp;&nbsp;
   <a href="#demo-walkthrough">Demo Walkthrough</a>
   &nbsp;&nbsp;/&nbsp;&nbsp;
-  <a href="https://github.com/tdk-landscape/tdk-cli">TDK CLI</a>
+  <a href="https://github.com/tdk-landscape/tdk-cli-core">TDK CLI</a>
 </p>
 
 <br>
@@ -39,7 +39,7 @@ You declare your enterprise services in simple `service.json` manifests. TDK aut
 - [Docker](https://docs.docker.com/get-docker/) is running.
 - [Tilt](https://docs.tilt.dev/install.html) is installed.
 - [Bun 1.2+](https://bun.sh/docs/installation) is installed.
-- [TDK CLI](https://github.com/tdk-landscape/tdk-cli#installation) is available as `tdk`.
+- [TDK CLI](https://github.com/tdk-landscape/tdk-cli-core#installation) is available as `tdk`.
 
 ```bash
 git clone https://github.com/tdk-landscape/tdk-erp-system.git
@@ -322,7 +322,7 @@ bun run typecheck
 <p align="center">
   <a href="https://github.com/tdk-landscape">TDK Landscape</a>
   &nbsp;&nbsp;/&nbsp;&nbsp;
-  <a href="https://github.com/tdk-landscape/tdk-cli">CLI</a>
+  <a href="https://github.com/tdk-landscape/tdk-cli-core">CLI</a>
   &nbsp;&nbsp;/&nbsp;&nbsp;
   <a href="SALES_PITCH.md">Sales Pitch</a>
   &nbsp;&nbsp;/&nbsp;&nbsp;

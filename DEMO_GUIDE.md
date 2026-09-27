@@ -333,7 +333,7 @@ docker ps
 
 ### TDK CLI Not Found
 **Issue:** `tdk` command not available
-**Solution:** Install TDK CLI per documentation at https://github.com/tdk-landscape/tdk-cli
+**Solution:** Install TDK CLI per documentation at https://github.com/tdk-landscape/tdk-cli-core
 
 ### Services Not Starting
 **Issue:** Services remain in red/yellow state in Tilt UI
@@ -419,7 +419,7 @@ The demo is designed to be technically impressive while remaining accessible to 
 ## Additional Resources
 
 - **Full Documentation:** https://github.com/tdk-landscape/tdk-erp-system
-- **TDK CLI:** https://github.com/tdk-landscape/tdk-cli
+- **TDK CLI:** https://github.com/tdk-landscape/tdk-cli-core
 - **Sales Pitch:** See SALES_PITCH.md for executive presentation
 - **Technical Architecture:** Contact for deep-dive technical session
 
