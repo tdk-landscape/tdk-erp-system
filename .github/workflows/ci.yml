@@ -1,4 +1,4 @@
-name: TDK CI
+name: 🏭 ERP System CI
 
 on:
   pull_request:
