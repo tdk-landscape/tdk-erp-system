@@ -1,13 +1,10 @@
 {
   "appName": "bom-management-api",
-  "domain": "manufacturing",
   "appType": "backend",
   "stack": "manufacturing",
   "port": 4404,
   "apiPath": "/api/bom-management",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

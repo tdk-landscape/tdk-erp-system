@@ -1,13 +1,10 @@
 {
   "appName": "quoting-api",
-  "domain": "sales",
   "appType": "backend",
   "stack": "sales",
   "port": 4302,
   "apiPath": "/api/quoting",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

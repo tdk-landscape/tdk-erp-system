@@ -1,13 +1,10 @@
 {
   "appName": "inventory-optimization-api",
-  "domain": "inventory",
   "appType": "backend",
   "stack": "inventory",
   "port": 4203,
   "apiPath": "/api/inventory-optimization",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

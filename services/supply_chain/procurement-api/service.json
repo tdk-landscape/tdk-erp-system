@@ -1,13 +1,10 @@
 {
   "appName": "procurement-api",
-  "domain": "supply_chain",
   "appType": "backend",
   "stack": "supply_chain",
   "port": 4500,
   "apiPath": "/api/procurement",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

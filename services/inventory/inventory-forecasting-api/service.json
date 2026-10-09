@@ -1,13 +1,10 @@
 {
   "appName": "inventory-forecasting-api",
-  "domain": "inventory",
   "appType": "backend",
   "stack": "inventory",
   "port": 4206,
   "apiPath": "/api/inventory-forecasting",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

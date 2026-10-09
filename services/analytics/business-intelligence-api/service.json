@@ -1,13 +1,10 @@
 {
   "appName": "business-intelligence-api",
-  "domain": "analytics",
   "appType": "backend",
   "stack": "analytics",
   "port": 4600,
   "apiPath": "/api/business-intelligence",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

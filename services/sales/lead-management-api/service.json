@@ -1,13 +1,10 @@
 {
   "appName": "lead-management-api",
-  "domain": "sales",
   "appType": "backend",
   "stack": "sales",
   "port": 4305,
   "apiPath": "/api/lead-management",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

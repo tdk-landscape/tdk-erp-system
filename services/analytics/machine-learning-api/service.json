@@ -1,13 +1,10 @@
 {
   "appName": "machine-learning-api",
-  "domain": "analytics",
   "appType": "backend",
   "stack": "analytics",
   "port": 4607,
   "apiPath": "/api/machine-learning",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

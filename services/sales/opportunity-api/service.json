@@ -1,13 +1,10 @@
 {
   "appName": "opportunity-api",
-  "domain": "sales",
   "appType": "backend",
   "stack": "sales",
   "port": 4306,
   "apiPath": "/api/opportunity",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

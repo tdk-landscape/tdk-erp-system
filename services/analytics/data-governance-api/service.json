@@ -1,17 +1,14 @@
 {
   "appName": "data-governance-api",
-  "domain": "analytics",
   "appType": "backend",
   "stack": "analytics",
   "port": 4604,
   "apiPath": "/api/data-governance",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  },
+  "dependsOn": [],
+  "healthCheckPath": "/health",
   "sablier": {
     "enable": true,
     "deferStart": true
-  }
+  },
+  "schemaVersion": 1
 }

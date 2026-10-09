@@ -1,15 +1,12 @@
 {
   "appName": "finance-dashboard-app",
-  "domain": "finance",
   "appType": "frontend",
   "stack": "finance",
   "port": 3010,
   "basePath": "/finance-dashboard-app",
-  "dependencies": [
+  "dependsOn": [
     "financial-analytics-api"
   ],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

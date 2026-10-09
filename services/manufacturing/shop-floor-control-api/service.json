@@ -1,13 +1,10 @@
 {
   "appName": "shop-floor-control-api",
-  "domain": "manufacturing",
   "appType": "backend",
   "stack": "manufacturing",
   "port": 4406,
   "apiPath": "/api/shop-floor-control",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

@@ -1,13 +1,10 @@
 {
   "appName": "quote-to-cash-api",
-  "domain": "sales",
   "appType": "backend",
   "stack": "sales",
   "port": 4319,
   "apiPath": "/api/quote-to-cash",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

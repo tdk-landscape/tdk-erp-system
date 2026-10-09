@@ -1,13 +1,10 @@
 {
   "appName": "tax-compliance-api",
-  "domain": "finance",
   "appType": "backend",
   "stack": "finance",
   "port": 4016,
   "apiPath": "/api/tax-compliance",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

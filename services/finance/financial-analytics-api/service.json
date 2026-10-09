@@ -1,13 +1,10 @@
 {
   "appName": "financial-analytics-api",
-  "domain": "finance",
   "appType": "backend",
   "stack": "finance",
   "port": 4020,
   "apiPath": "/api/financial-analytics",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

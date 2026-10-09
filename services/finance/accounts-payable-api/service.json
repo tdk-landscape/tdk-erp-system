@@ -1,13 +1,10 @@
 {
   "appName": "accounts-payable-api",
-  "domain": "finance",
   "appType": "backend",
   "stack": "finance",
   "port": 4011,
   "apiPath": "/api/accounts-payable",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

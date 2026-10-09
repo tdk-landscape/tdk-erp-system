@@ -1,13 +1,10 @@
 {
   "appName": "analytics-portal-api",
-  "domain": "analytics",
   "appType": "backend",
   "stack": "analytics",
   "port": 4606,
   "apiPath": "/api/analytics-portal",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

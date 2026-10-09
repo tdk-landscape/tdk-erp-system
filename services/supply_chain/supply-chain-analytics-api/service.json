@@ -1,13 +1,10 @@
 {
   "appName": "supply-chain-analytics-api",
-  "domain": "supply_chain",
   "appType": "backend",
   "stack": "supply_chain",
   "port": 4507,
   "apiPath": "/api/supply-chain-analytics",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

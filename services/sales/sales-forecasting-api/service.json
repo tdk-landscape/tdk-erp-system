@@ -1,13 +1,10 @@
 {
   "appName": "sales-forecasting-api",
-  "domain": "sales",
   "appType": "backend",
   "stack": "sales",
   "port": 4304,
   "apiPath": "/api/sales-forecasting",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

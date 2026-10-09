@@ -1,15 +1,12 @@
 {
   "appName": "production-control-app",
-  "domain": "manufacturing",
   "appType": "frontend",
   "stack": "manufacturing",
   "port": 3050,
   "basePath": "/production-control-app",
-  "dependencies": [
+  "dependsOn": [
     "production-planning-api"
   ],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

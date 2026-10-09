@@ -1,13 +1,10 @@
 {
   "appName": "onboarding-api",
-  "domain": "hr",
   "appType": "backend",
   "stack": "hr",
   "port": 4102,
   "apiPath": "/api/onboarding",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }
