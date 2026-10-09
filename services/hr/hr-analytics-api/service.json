@@ -1,13 +1,10 @@
 {
   "appName": "hr-analytics-api",
-  "domain": "hr",
   "appType": "backend",
   "stack": "hr",
   "port": 4111,
   "apiPath": "/api/hr-analytics",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

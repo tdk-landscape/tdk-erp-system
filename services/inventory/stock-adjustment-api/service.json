@@ -1,13 +1,10 @@
 {
   "appName": "stock-adjustment-api",
-  "domain": "inventory",
   "appType": "backend",
   "stack": "inventory",
   "port": 4216,
   "apiPath": "/api/stock-adjustment",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

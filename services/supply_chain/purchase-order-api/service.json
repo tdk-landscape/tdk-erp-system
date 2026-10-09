@@ -1,13 +1,10 @@
 {
   "appName": "purchase-order-api",
-  "domain": "supply_chain",
   "appType": "backend",
   "stack": "supply_chain",
   "port": 4502,
   "apiPath": "/api/purchase-order",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

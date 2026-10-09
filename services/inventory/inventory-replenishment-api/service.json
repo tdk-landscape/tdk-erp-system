@@ -1,13 +1,10 @@
 {
   "appName": "inventory-replenishment-api",
-  "domain": "inventory",
   "appType": "backend",
   "stack": "inventory",
   "port": 4212,
   "apiPath": "/api/inventory-replenishment",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

@@ -1,13 +1,10 @@
 {
   "appName": "receiving-api",
-  "domain": "supply_chain",
   "appType": "backend",
   "stack": "supply_chain",
   "port": 4509,
   "apiPath": "/api/receiving",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

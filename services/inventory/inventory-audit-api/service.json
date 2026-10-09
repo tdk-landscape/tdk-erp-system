@@ -1,13 +1,10 @@
 {
   "appName": "inventory-audit-api",
-  "domain": "inventory",
   "appType": "backend",
   "stack": "inventory",
   "port": 4210,
   "apiPath": "/api/inventory-audit",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

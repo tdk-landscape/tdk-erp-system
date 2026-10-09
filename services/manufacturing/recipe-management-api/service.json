@@ -1,13 +1,10 @@
 {
   "appName": "recipe-management-api",
-  "domain": "manufacturing",
   "appType": "backend",
   "stack": "manufacturing",
   "port": 4411,
   "apiPath": "/api/recipe-management",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

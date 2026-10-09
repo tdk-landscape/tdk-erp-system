@@ -1,13 +1,10 @@
 {
   "appName": "sku-management-api",
-  "domain": "inventory",
   "appType": "backend",
   "stack": "inventory",
   "port": 4205,
   "apiPath": "/api/sku-management",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

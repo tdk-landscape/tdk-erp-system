@@ -1,13 +1,10 @@
 {
   "appName": "audit-trail-api",
-  "domain": "finance",
   "appType": "backend",
   "stack": "finance",
   "port": 4024,
   "apiPath": "/api/audit-trail",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

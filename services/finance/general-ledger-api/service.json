@@ -1,13 +1,10 @@
 {
   "appName": "general-ledger-api",
-  "domain": "finance",
   "appType": "backend",
   "stack": "finance",
   "port": 4010,
   "apiPath": "/api/general-ledger",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

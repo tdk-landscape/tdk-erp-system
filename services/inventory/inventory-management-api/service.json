@@ -1,13 +1,10 @@
 {
   "appName": "inventory-management-api",
-  "domain": "inventory",
   "appType": "backend",
   "stack": "inventory",
   "port": 4200,
   "apiPath": "/api/inventory-management",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

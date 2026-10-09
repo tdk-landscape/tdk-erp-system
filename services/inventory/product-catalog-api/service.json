@@ -1,13 +1,10 @@
 {
   "appName": "product-catalog-api",
-  "domain": "inventory",
   "appType": "backend",
   "stack": "inventory",
   "port": 4204,
   "apiPath": "/api/product-catalog",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }

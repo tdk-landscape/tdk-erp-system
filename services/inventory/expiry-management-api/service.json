@@ -1,13 +1,10 @@
 {
   "appName": "expiry-management-api",
-  "domain": "inventory",
   "appType": "backend",
   "stack": "inventory",
   "port": 4214,
   "apiPath": "/api/expiry-management",
-  "dependencies": [],
-  "healthCheck": {
-    "enabled": true,
-    "path": "/health"
-  }
+  "dependsOn": [],
+  "healthCheckPath": "/health",
+  "schemaVersion": 1
 }
